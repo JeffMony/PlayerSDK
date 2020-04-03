@@ -1,4 +1,4 @@
-package com.jeffmony.playersdk;
+package com.jeffmony.playerdemo;
 
 import androidx.appcompat.app.AppCompatActivity;
 
