@@ -4,14 +4,12 @@ import android.content.Context;
 import android.net.Uri;
 import android.view.Surface;
 
-import com.android.player.impl.ExoPlayerImpl;
-import com.android.player.impl.IjkPlayerImpl;
-import com.android.player.impl.MediaPlayerImpl;
-import com.android.player.impl.PlayerImpl;
+import com.jeffmony.playersdk.impl.ExoPlayerImpl;
+import com.jeffmony.playersdk.impl.IjkPlayerImpl;
+import com.jeffmony.playersdk.impl.PlayerImpl;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 public class CommonPlayer implements IPlayer {
@@ -27,15 +25,15 @@ public class CommonPlayer implements IPlayer {
         this(context, type, null);
     }
 
-    public CommonPlayer(Context context, PlayerType type, PlayerAttributes attributes) {
+    public CommonPlayer(Context context, PlayerType type, PlayerParams params) {
         this.mType = type;
 
         if (type == PlayerType.MEDIA_PLAYER) {
-            mPlayerImpl = new MediaPlayerImpl(context, attributes);
+//            mPlayerImpl = new MediaPlayerImpl(context, params);
         } else if (type == PlayerType.EXO_PLAYER) {
-            mPlayerImpl = new ExoPlayerImpl(context, attributes);
+            mPlayerImpl = new ExoPlayerImpl(context, params);
         } else if (type == PlayerType.IJK_PLAYER) {
-            mPlayerImpl = new IjkPlayerImpl(context, attributes);
+            mPlayerImpl = new IjkPlayerImpl(context, params);
         }
     }
 

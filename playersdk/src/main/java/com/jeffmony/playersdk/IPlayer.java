@@ -11,8 +11,6 @@ import java.util.Map;
 
 public interface IPlayer {
 
-    void startLocalProxy(String url, HashMap<String, String> headers);
-
     void setDataSource(Context context, Uri uri)
             throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
 
