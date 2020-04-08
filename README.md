@@ -7,5 +7,5 @@
 > * 支持二维码扫描网址功能
 > * 支持循环播放的功能
 
-欢迎关注我的公众号JeffMony,我会持续为你带来音视频---算法---Android---python 方面的知识分享
+欢迎关注我的公众号JeffMony，我会持续为你带来音视频---算法---Android---python 方面的知识分享
 ![](./files/JeffMony.jpg)
