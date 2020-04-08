@@ -125,6 +125,16 @@ public class IjkPlayerImpl extends PlayerImpl {
     }
 
     @Override
+    public void setLooping(boolean isLooping) {
+        mPlayer.setLooping(isLooping);
+    }
+
+    @Override
+    public boolean isLooping() {
+        return mPlayer.isLooping();
+    }
+
+    @Override
     public void stop() throws IllegalStateException {
         mPlayer.stop();
         super.stop();
@@ -155,19 +165,6 @@ public class IjkPlayerImpl extends PlayerImpl {
 
     };
 
-//    private IjkMediaPlayer.OnVideoSizeChangedListener mOnVideoSizeChangedListener = new IjkMediaPlayer.OnVideoSizeChangedListener() {
-//
-//        @Override
-//        public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
-//            float pixelRatio = sar_num * 1.0f / sar_den;
-//            if (Float.compare(pixelRatio, Float.NaN) == 0) {
-//                pixelRatio = 1.0f;
-//            }
-//            notifyOnVideoSizeChanged(width, height, 0, pixelRatio);
-//        }
-//
-//    };
-
     private IjkMediaPlayer.OnVideoDarSizeChangedListener mOnVideoDarSizeChangedListener = new IjkMediaPlayer.OnVideoDarSizeChangedListener() {
         @Override
         public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den, int dar_num, int dar_den) {
@@ -176,7 +173,6 @@ public class IjkPlayerImpl extends PlayerImpl {
                 pixelRatio = 1.0f;
             }
             float darRatio = dar_num * 1.0f / dar_den;
-            LogUtis.w("litianpeng width="+width+", height="+height+", darRatio="+darRatio);
             notifyOnVideoSizeChanged(width, height, 0, pixelRatio, darRatio);
         }
     };

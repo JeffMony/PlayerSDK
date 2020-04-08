@@ -36,6 +36,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private int mScreenWidth;
     private long mTotalDuration;
     private int mPlayerType;
+    private boolean mIsLooping;
 
     private TextureView mVideoView;
     private SeekBar mProgressView;
@@ -74,6 +75,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
 
         mUrl = getIntent().getStringExtra("video_url");
         mPlayerType = getIntent().getIntExtra("player_type", 1);
+        mIsLooping = getIntent().getBooleanExtra("is_looping", false);
         mScreenWidth = ScreenUtils.getScreenWidth(this);
         initViews();
     }
@@ -125,6 +127,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
             Log.w(TAG, "setDataSource failed, exception = " + e.getMessage());
             return;
         }
+        mPlayer.setLooping(mIsLooping);
         mPlayer.setSurface(mSurface);
         mPlayer.setOnPreparedListener(mPrepareListener);
         mPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);

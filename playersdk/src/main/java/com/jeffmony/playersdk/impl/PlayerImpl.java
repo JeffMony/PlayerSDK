@@ -113,6 +113,16 @@ public class PlayerImpl implements IPlayer {
     }
 
     @Override
+    public boolean isLooping() {
+        return false;
+    }
+
+    @Override
+    public void setLooping(boolean isLooping) {
+
+    }
+
+    @Override
     public long getCurrentPosition() {
         return 0;
     }

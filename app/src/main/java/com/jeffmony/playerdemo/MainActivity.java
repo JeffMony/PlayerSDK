@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText mUrlText;
     private Button mOrcodeBtn;
     private Button mPlayBtn;
+    private Button mLoopBtn;
     private RadioButton mExoBtn;
     private RadioButton mIjkBtn;
 
@@ -48,15 +49,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mUrlText = (EditText) findViewById(R.id.video_url_text);
         mOrcodeBtn = (Button) findViewById(R.id.orcode_btn);
         mPlayBtn = (Button) findViewById(R.id.play_btn);
+        mLoopBtn = (Button) findViewById(R.id.loop_btn);
         mExoBtn = (RadioButton) findViewById(R.id.exo_btn);
         mIjkBtn = (RadioButton) findViewById(R.id.ijk_btn);
 
-        mUrlText.setText("https://baidu.com-l-baidu.com/20190219/12123_e796a823/index.m3u8");
+        mUrlText.setText("http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8");
 
-        mOrcodeBtn.setOnClickListener(this);
-        mPlayBtn.setOnClickListener(this);
         mExoBtn.setOnClickListener(this);
         mIjkBtn.setOnClickListener(this);
+        mOrcodeBtn.setOnClickListener(this);
+        mPlayBtn.setOnClickListener(this);
+        mLoopBtn.setOnClickListener(this);
     }
 
     private void checkCameraPermissions() {
@@ -93,20 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v == mOrcodeBtn) {
-            mCls = CaptureActivity.class;
-            checkCameraPermissions();
-        } else if (v == mPlayBtn) {
-            String url = mUrlText.getText().toString();
-            if (TextUtils.isEmpty(url)) {
-                Toast.makeText(this, R.string.url_tip, Toast.LENGTH_SHORT).show();
-            } else {
-                Intent intent = new Intent(this, PlayerActivity.class);
-                intent.putExtra("video_url", url);
-                intent.putExtra("player_type", mPlayerType);
-                startActivity(intent);
-            }
-        } else if (v == mExoBtn) {
+        if (v == mExoBtn) {
             mExoBtn.setChecked(true);
             mIjkBtn.setChecked(false);
             mPlayerType = PlayerType.EXO_PLAYER;
@@ -114,6 +104,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mExoBtn.setChecked(false);
             mIjkBtn.setChecked(true);
             mPlayerType = PlayerType.IJK_PLAYER;
+        } else if (v == mOrcodeBtn) {
+            mCls = CaptureActivity.class;
+            checkCameraPermissions();
+        } else if (v == mPlayBtn) {
+            playWithLooping(false);
+        } else if (v == mLoopBtn) {
+            playWithLooping(true);
+        }
+    }
+
+    private void playWithLooping(boolean isLooping) {
+        String url = mUrlText.getText().toString();
+        if (TextUtils.isEmpty(url)) {
+            Toast.makeText(this, R.string.url_tip, Toast.LENGTH_SHORT).show();
+        } else {
+            Intent intent = new Intent(this, PlayerActivity.class);
+            intent.putExtra("video_url", url);
+            intent.putExtra("player_type", mPlayerType);
+            intent.putExtra("is_looping", isLooping);
+            startActivity(intent);
         }
     }
 }

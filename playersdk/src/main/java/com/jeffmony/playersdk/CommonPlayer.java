@@ -119,6 +119,16 @@ public class CommonPlayer implements IPlayer {
     }
 
     @Override
+    public void setLooping(boolean isLooping) {
+        mPlayerImpl.setLooping(isLooping);
+    }
+
+    @Override
+    public boolean isLooping() {
+        return mPlayerImpl.isLooping();
+    }
+
+    @Override
     public long getCurrentPosition() {
         return mPlayerImpl.getCurrentPosition();
     }

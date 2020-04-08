@@ -40,6 +40,7 @@ public class ExoPlayerImpl extends PlayerImpl {
     private boolean mIsInitPlayerListener = false;
     private PlayerEventListener mEventListener;
     private PlayerVideoListener mVideoListener;
+    private boolean mIsLooping = false;
 
     public ExoPlayerImpl(Context context, PlayerParams params) {
         super(context, params);
@@ -143,6 +144,24 @@ public class ExoPlayerImpl extends PlayerImpl {
     public void seekTo(long msec) throws IllegalStateException {
         mPlayer.seekTo(msec);
         super.seekTo(msec);
+    }
+
+    @Override
+    public void setLooping(boolean isLooping) {
+        if (isLooping) {
+            if (!mIsLooping) {
+                mPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
+            }
+            mIsLooping = true;
+        } else {
+            mPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
+            mIsLooping = false;
+        }
+    }
+
+    @Override
+    public boolean isLooping() {
+        return mIsLooping;
     }
 
     private void initPlayerListener() {

@@ -42,6 +42,10 @@ public interface IPlayer {
 
     void seekTo(long msec) throws IllegalStateException;
 
+    void setLooping(boolean isLooping);
+
+    boolean isLooping();
+
     long getCurrentPosition();
 
     long getDuration();
