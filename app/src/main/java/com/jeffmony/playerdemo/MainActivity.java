@@ -11,10 +11,12 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.jeffmony.orcode.CaptureActivity;
 import com.jeffmony.orcode.Intents;
+import com.jeffmony.playersdk.PlayerType;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -28,9 +30,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText mUrlText;
     private Button mOrcodeBtn;
     private Button mPlayBtn;
+    private RadioButton mExoBtn;
+    private RadioButton mIjkBtn;
 
     private Class<?> mCls;
     private boolean mIsContinuousScan;
+    private PlayerType mPlayerType = PlayerType.EXO_PLAYER;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +48,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mUrlText = (EditText) findViewById(R.id.video_url_text);
         mOrcodeBtn = (Button) findViewById(R.id.orcode_btn);
         mPlayBtn = (Button) findViewById(R.id.play_btn);
+        mExoBtn = (RadioButton) findViewById(R.id.exo_btn);
+        mIjkBtn = (RadioButton) findViewById(R.id.ijk_btn);
+
         mUrlText.setText("https://baidu.com-l-baidu.com/20190219/12123_e796a823/index.m3u8");
 
         mOrcodeBtn.setOnClickListener(this);
         mPlayBtn.setOnClickListener(this);
+        mExoBtn.setOnClickListener(this);
+        mIjkBtn.setOnClickListener(this);
     }
 
     private void checkCameraPermissions() {
@@ -93,8 +103,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 Intent intent = new Intent(this, PlayerActivity.class);
                 intent.putExtra("video_url", url);
+                intent.putExtra("player_type", mPlayerType);
                 startActivity(intent);
             }
+        } else if (v == mExoBtn) {
+            mExoBtn.setChecked(true);
+            mIjkBtn.setChecked(false);
+            mPlayerType = PlayerType.EXO_PLAYER;
+        } else if (v == mIjkBtn) {
+            mExoBtn.setChecked(false);
+            mIjkBtn.setChecked(true);
+            mPlayerType = PlayerType.IJK_PLAYER;
         }
     }
 }

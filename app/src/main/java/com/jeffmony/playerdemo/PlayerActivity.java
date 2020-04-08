@@ -35,6 +35,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private String mUrl;
     private int mScreenWidth;
     private long mTotalDuration;
+    private int mPlayerType;
 
     private TextureView mVideoView;
     private SeekBar mProgressView;
@@ -72,6 +73,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_player);
 
         mUrl = getIntent().getStringExtra("video_url");
+        mPlayerType = getIntent().getIntExtra("player_type", 1);
         mScreenWidth = ScreenUtils.getScreenWidth(this);
         initViews();
     }
@@ -110,7 +112,13 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     };
 
     private void initPlayer() {
-        mPlayer = new CommonPlayer(this, PlayerType.EXO_PLAYER);
+        if (mPlayerType == 1) {
+            mPlayer = new CommonPlayer(this, PlayerType.EXO_PLAYER);
+        } else if (mPlayerType == 2) {
+            mPlayer = new CommonPlayer(this, PlayerType.IJK_PLAYER);
+        } else {
+            return;
+        }
         try {
             mPlayer.setDataSource(this, Uri.parse(mUrl));
         } catch (Exception e) {

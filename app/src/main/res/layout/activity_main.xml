@@ -5,15 +5,16 @@
     android:orientation="vertical">
     
     <EditText
+        android:textSize="15sp"
         android:id="@+id/video_url_text"
-        android:layout_margin="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_width="match_parent"
         android:layout_height="100dp" />
 
     <LinearLayout
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
@@ -31,6 +32,33 @@
             android:text="播放视频"
             android:layout_weight="1"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:textColor="@color/black"
+            android:text="请选择播放器类型"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <RadioButton
+            android:layout_marginLeft="10dp"
+            android:id="@+id/exo_btn"
+            android:text="exo"
+            android:checked="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <RadioButton
+            android:layout_marginLeft="10dp"
+            android:id="@+id/ijk_btn"
+            android:text="ijk"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
 
