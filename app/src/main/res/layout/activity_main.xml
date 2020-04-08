@@ -1,7 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    
+    <EditText
+        android:id="@+id/video_url_text"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="100dp" />
 
+    <LinearLayout
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <Button
+            android:id="@+id/orcode_btn"
+            android:layout_marginRight="5dp"
+            android:text="二维码"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-</RelativeLayout>
+        <Button
+            android:layout_marginLeft="5dp"
+            android:id="@+id/play_btn"
+            android:text="播放视频"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</LinearLayout>
