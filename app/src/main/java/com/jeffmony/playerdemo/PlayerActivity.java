@@ -83,6 +83,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mTimeView = (TextView) findViewById(R.id.time_view);
         mVideoView.setSurfaceTextureListener(mSurfaceTextureListener);
         mProgressView.setOnSeekBarChangeListener(mSeekBarChangeListener);
+        mVideoStateBtn.setOnClickListener(this);
     }
 
     private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
