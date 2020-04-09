@@ -6,7 +6,6 @@ import android.view.Surface;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 public interface IPlayer {
