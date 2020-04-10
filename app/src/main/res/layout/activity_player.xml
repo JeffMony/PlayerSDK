@@ -44,4 +44,42 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/speed_btn1"
+            android:layout_weight="1"
+            android:text="0.75X"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/speed_btn2"
+            android:layout_weight="1"
+            android:text="1.0X"
+            android:textColor="@color/red"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/speed_btn3"
+            android:layout_weight="1"
+            android:text="1.25X"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/speed_btn4"
+            android:layout_weight="1"
+            android:text="1.5X"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/speed_btn5"
+            android:layout_weight="1"
+            android:text="2.0X"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
 </LinearLayout>

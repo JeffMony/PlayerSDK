@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -32,18 +33,24 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private static final int INTERVAL = 1000;
     private static final int MAX_PROGRESS = 1000;
 
+    private TextureView mVideoView;
+    private SeekBar mProgressView;
+    private TextView mTimeView;
+    private ImageButton mVideoStateBtn;
+    private Button mSpeedBtn1;
+    private Button mSpeedBtn2;
+    private Button mSpeedBtn3;
+    private Button mSpeedBtn4;
+    private Button mSpeedBtn5;
+
     private String mUrl;
     private int mScreenWidth;
     private long mTotalDuration;
     private int mPlayerType;
     private boolean mIsLooping;
-
-    private TextureView mVideoView;
-    private SeekBar mProgressView;
-    private TextView mTimeView;
-    private ImageButton mVideoStateBtn;
     private Surface mSurface;
     private CommonPlayer mPlayer;
+    private float mSpeed = 1.0f;
 
     private WeakHandler mHandler = new WeakHandler(new Handler.Callback() {
         @Override
@@ -85,9 +92,20 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mProgressView = (SeekBar) findViewById(R.id.video_progress_view);
         mVideoStateBtn = (ImageButton) findViewById(R.id.video_state_btn);
         mTimeView = (TextView) findViewById(R.id.time_view);
+        mSpeedBtn1 = (Button) findViewById(R.id.speed_btn1);
+        mSpeedBtn2 = (Button) findViewById(R.id.speed_btn2);
+        mSpeedBtn3 = (Button) findViewById(R.id.speed_btn3);
+        mSpeedBtn4 = (Button) findViewById(R.id.speed_btn4);
+        mSpeedBtn5 = (Button) findViewById(R.id.speed_btn5);
+
         mVideoView.setSurfaceTextureListener(mSurfaceTextureListener);
         mProgressView.setOnSeekBarChangeListener(mSeekBarChangeListener);
         mVideoStateBtn.setOnClickListener(this);
+        mSpeedBtn1.setOnClickListener(this);
+        mSpeedBtn2.setOnClickListener(this);
+        mSpeedBtn3.setOnClickListener(this);
+        mSpeedBtn4.setOnClickListener(this);
+        mSpeedBtn5.setOnClickListener(this);
     }
 
     private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
@@ -216,10 +234,43 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    private void changeSpeed(float speed) {
+        if (mSpeed == speed)
+            return;
+        mSpeed = speed;
+        mSpeedBtn1.setTextColor(getResources().getColor(R.color.black));
+        mSpeedBtn2.setTextColor(getResources().getColor(R.color.black));
+        mSpeedBtn3.setTextColor(getResources().getColor(R.color.black));
+        mSpeedBtn4.setTextColor(getResources().getColor(R.color.black));
+        mSpeedBtn5.setTextColor(getResources().getColor(R.color.black));
+        mPlayer.setSpeed(speed);
+        if (speed == 0.75f) {
+            mSpeedBtn1.setTextColor(getResources().getColor(R.color.red));
+        } else if (speed == 1.0f) {
+            mSpeedBtn2.setTextColor(getResources().getColor(R.color.red));
+        } else if (speed == 1.25f) {
+            mSpeedBtn3.setTextColor(getResources().getColor(R.color.red));
+        } else if (speed ==1.5f) {
+            mSpeedBtn4.setTextColor(getResources().getColor(R.color.red));
+        } else if (speed == 2.0f) {
+            mSpeedBtn5.setTextColor(getResources().getColor(R.color.red));
+        }
+    }
+
     @Override
     public void onClick(View v) {
         if (v == mVideoStateBtn) {
             updatePlayerState();
+        } else if (v == mSpeedBtn1) {
+            changeSpeed(0.75f);
+        } else if (v == mSpeedBtn2) {
+            changeSpeed(1.0f);
+        } else if (v == mSpeedBtn3) {
+            changeSpeed(1.25f);
+        } else if (v == mSpeedBtn4) {
+            changeSpeed(1.5f);
+        } else if (v == mSpeedBtn5) {
+            changeSpeed(2.0f);
         }
     }
 
