@@ -36,6 +36,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     api 'androidx.media:media:' + androidxMediaVersion
+    api 'com.squareup.okhttp3:okhttp:3.12.8'
     implementation 'androidx.annotation:annotation:' + androidxAnnotationVersion
     implementation 'androidx.appcompat:appcompat:1.1.0'
 

@@ -9,6 +9,7 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -21,10 +22,15 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoListener;
 import com.jeffmony.playersdk.LogUtis;
 import com.jeffmony.playersdk.PlayerParams;
+import com.jeffmony.playersdk.net.HttpEventListener;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.ConnectionPool;
+import okhttp3.OkHttpClient;
 
 public class ExoPlayerImpl extends PlayerImpl {
 
@@ -41,11 +47,19 @@ public class ExoPlayerImpl extends PlayerImpl {
     private PlayerEventListener mEventListener;
     private PlayerVideoListener mVideoListener;
     private boolean mIsLooping = false;
+    private boolean mUseOkHttp = false;
 
     public ExoPlayerImpl(Context context, PlayerParams params) {
         super(context, params);
         mContext = context.getApplicationContext();
         mPlayer = new SimpleExoPlayer.Builder(context).build();
+        initPlayerParams(params);
+    }
+
+
+    private void initPlayerParams(PlayerParams params) {
+        if (params == null) return;
+        mUseOkHttp = params.useOkHttp();
     }
 
     @Override
@@ -173,9 +187,17 @@ public class ExoPlayerImpl extends PlayerImpl {
     }
 
     private DataSource.Factory buildDataSourceFactory() {
-        String userAgent = Util.getUserAgent(mContext, "ExoPlayerDemo");
-        DefaultDataSourceFactory upstreamFactory =
-                new DefaultDataSourceFactory(mContext, new DefaultHttpDataSourceFactory(userAgent));
+        String userAgent = Util.getUserAgent(mContext, "JeffPlayerSDK");
+        DefaultDataSourceFactory upstreamFactory;
+
+        if (mUseOkHttp) {
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.eventListenerFactory(HttpEventListener.FACTORY);
+            builder.connectionPool(new ConnectionPool(5, 2, TimeUnit.MINUTES));
+            upstreamFactory = new DefaultDataSourceFactory(mContext, new OkHttpDataSourceFactory(builder.build(), userAgent));
+        } else {
+            upstreamFactory = new DefaultDataSourceFactory(mContext, new DefaultHttpDataSourceFactory(userAgent));
+        }
         return upstreamFactory;
     }
 

@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
@@ -20,7 +22,7 @@ import com.jeffmony.playersdk.PlayerType;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     public static final int REQUEST_CODE_SCAN = 0x01;
     public static final int RC_CAMERA = 0x01;
@@ -33,10 +35,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mLoopBtn;
     private RadioButton mExoBtn;
     private RadioButton mIjkBtn;
+    private CheckBox mOkHttpBox;
 
     private Class<?> mCls;
     private boolean mIsContinuousScan;
     private PlayerType mPlayerType = PlayerType.EXO_PLAYER;
+    private boolean mUseOkHttp = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mLoopBtn = (Button) findViewById(R.id.loop_btn);
         mExoBtn = (RadioButton) findViewById(R.id.exo_btn);
         mIjkBtn = (RadioButton) findViewById(R.id.ijk_btn);
+        mOkHttpBox = (CheckBox) findViewById(R.id.okhttp_box);
 
         mUrlText.setText("http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8");
 
@@ -60,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mOrcodeBtn.setOnClickListener(this);
         mPlayBtn.setOnClickListener(this);
         mLoopBtn.setOnClickListener(this);
+        mOkHttpBox.setOnCheckedChangeListener(this);
     }
 
     private void checkCameraPermissions() {
@@ -114,6 +120,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (buttonView == mOkHttpBox) {
+            mUseOkHttp = isChecked;
+        }
+    }
+
     private void playWithLooping(boolean isLooping) {
         String url = mUrlText.getText().toString();
         if (TextUtils.isEmpty(url)) {
@@ -123,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             intent.putExtra("video_url", url);
             intent.putExtra("player_type", mPlayerType);
             intent.putExtra("is_looping", isLooping);
+            intent.putExtra("use_okhttp", mUseOkHttp);
             startActivity(intent);
         }
     }

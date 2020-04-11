@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.jeffmony.playersdk.CommonPlayer;
 import com.jeffmony.playersdk.IPlayer;
+import com.jeffmony.playersdk.PlayerParams;
 import com.jeffmony.playersdk.PlayerType;
 import com.jeffmony.playersdk.WeakHandler;
 import com.jeffmony.playersdk.utils.ScreenUtils;
@@ -48,6 +49,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private long mTotalDuration;
     private int mPlayerType;
     private boolean mIsLooping;
+    private boolean mUseOkHttp;
     private Surface mSurface;
     private CommonPlayer mPlayer;
     private float mSpeed = 1.0f;
@@ -83,6 +85,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mUrl = getIntent().getStringExtra("video_url");
         mPlayerType = getIntent().getIntExtra("player_type", 1);
         mIsLooping = getIntent().getBooleanExtra("is_looping", false);
+        mUseOkHttp = getIntent().getBooleanExtra("use_okhttp", false);
         mScreenWidth = ScreenUtils.getScreenWidth(this);
         initViews();
     }
@@ -132,10 +135,12 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     };
 
     private void initPlayer() {
+        PlayerParams params = new PlayerParams();
+        params.setUseOkHttp(mUseOkHttp);
         if (mPlayerType == 1) {
-            mPlayer = new CommonPlayer(this, PlayerType.EXO_PLAYER);
+            mPlayer = new CommonPlayer(this, PlayerType.EXO_PLAYER, params);
         } else if (mPlayerType == 2) {
-            mPlayer = new CommonPlayer(this, PlayerType.IJK_PLAYER);
+            mPlayer = new CommonPlayer(this, PlayerType.IJK_PLAYER, params);
         } else {
             return;
         }
