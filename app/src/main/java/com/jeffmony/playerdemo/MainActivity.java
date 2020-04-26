@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.jeffmony.orcode.CaptureActivity;
 import com.jeffmony.orcode.Intents;
 import com.jeffmony.playersdk.PlayerType;
+import com.jeffmony.playersdk.videoinfo.VideoInfoParserManager;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RadioButton mExoBtn;
     private RadioButton mIjkBtn;
     private CheckBox mOkHttpBox;
+
+    private Button mParseVideoBtn;
 
     private Class<?> mCls;
     private boolean mIsContinuousScan;
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mExoBtn = (RadioButton) findViewById(R.id.exo_btn);
         mIjkBtn = (RadioButton) findViewById(R.id.ijk_btn);
         mOkHttpBox = (CheckBox) findViewById(R.id.okhttp_box);
+        mParseVideoBtn = (Button) findViewById(R.id.parse_video_btn);
 
         mUrlText.setText("http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8");
 
@@ -65,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mOrcodeBtn.setOnClickListener(this);
         mPlayBtn.setOnClickListener(this);
         mLoopBtn.setOnClickListener(this);
+        mParseVideoBtn.setOnClickListener(this);
         mOkHttpBox.setOnCheckedChangeListener(this);
     }
 
@@ -117,6 +122,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             playWithLooping(false);
         } else if (v == mLoopBtn) {
             playWithLooping(true);
+        } else if (v == mParseVideoBtn) {
+            VideoInfoParserManager.getInstance().parseVideoInfo(mUrlText.getText().toString());
         }
     }
 
@@ -134,7 +141,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             Intent intent = new Intent(this, PlayerActivity.class);
             intent.putExtra("video_url", url);
-            intent.putExtra("player_type", mPlayerType);
+            int type = 0;
+            if (mPlayerType == PlayerType.EXO_PLAYER) {
+                type = 1;
+            } else if (mPlayerType == PlayerType.IJK_PLAYER) {
+                type = 2;
+            }
+            intent.putExtra("player_type", type);
             intent.putExtra("is_looping", isLooping);
             intent.putExtra("use_okhttp", mUseOkHttp);
             startActivity(intent);

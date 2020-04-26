@@ -39,35 +39,71 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-        <Button
-            android:id="@+id/orcode_btn"
-            android:layout_marginRight="5dp"
-            android:text="二维码"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
 
-        <Button
-            android:layout_marginLeft="5dp"
-            android:id="@+id/play_btn"
-            android:text="播放视频"
-            android:layout_marginRight="5dp"
-            android:layout_weight="1"
+        <LinearLayout
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" >
+            <Button
+                android:id="@+id/orcode_btn"
+                android:layout_marginRight="5dp"
+                android:text="二维码"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/loop_btn"
-            android:text="循环播放"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="1"
+            <Button
+                android:layout_marginLeft="5dp"
+                android:id="@+id/play_btn"
+                android:text="播放视频"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/loop_btn"
+                android:text="循环播放"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        
+        <LinearLayout
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" >
+            <Button
+                android:id="@+id/parse_video_btn"
+                android:layout_marginRight="5dp"
+                android:text="解析视频"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:visibility="invisible"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:visibility="invisible"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     </LinearLayout>
     
     <LinearLayout
