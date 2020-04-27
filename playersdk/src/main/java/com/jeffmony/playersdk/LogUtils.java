@@ -2,7 +2,7 @@ package com.jeffmony.playersdk;
 
 import android.util.Log;
 
-public class LogUtis {
+public class LogUtils {
     private static final String TAG = "PlayerSDK";
     private static final int ERROR_LEVEL = 5;
     private static final int WARN_LEVEL = 4;

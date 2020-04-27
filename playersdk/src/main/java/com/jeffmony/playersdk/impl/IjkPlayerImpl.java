@@ -5,7 +5,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.view.Surface;
 
-import com.jeffmony.playersdk.LogUtis;
+import com.jeffmony.playersdk.LogUtils;
 import com.jeffmony.playersdk.PlayerParams;
 
 import java.io.FileDescriptor;
@@ -52,8 +52,8 @@ public class IjkPlayerImpl extends PlayerImpl {
 
     private void initPlayerListeners() {
         mPlayer.setOnPreparedListener(mOnPreparedListener);
-//        mPlayer.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
-        mPlayer.setOnVideoDarSizeChangedListener(mOnVideoDarSizeChangedListener);
+        mPlayer.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
+//        mPlayer.setOnVideoDarSizeChangedListener(mOnVideoDarSizeChangedListener);
         mPlayer.setOnErrorListener(mOnErrorListener);
     }
 
@@ -163,6 +163,13 @@ public class IjkPlayerImpl extends PlayerImpl {
             notifyOnPrepared();
         }
 
+    };
+
+    private IjkMediaPlayer.OnVideoSizeChangedListener mOnVideoSizeChangedListener = new IjkMediaPlayer.OnVideoSizeChangedListener() {
+        @Override
+        public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
+            notifyOnVideoSizeChanged(width, height, sar_num, sar_den, 0);
+        }
     };
 
     private IjkMediaPlayer.OnVideoDarSizeChangedListener mOnVideoDarSizeChangedListener = new IjkMediaPlayer.OnVideoDarSizeChangedListener() {

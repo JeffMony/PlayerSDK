@@ -1,6 +1,6 @@
 package com.jeffmony.playersdk.videoinfo;
 
-import com.jeffmony.playersdk.LogUtis;
+import com.jeffmony.playersdk.LogUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,9 +35,9 @@ public class VideoInfoParserManager {
         Response response = null;
         try {
             response = client.newCall(builder.build()).execute();
-            LogUtis.i("parseVideoInfo code="+response.code());
+            LogUtils.i("parseVideoInfo code="+response.code());
         } catch (Exception e) {
-            LogUtis.w(TAG + " parseVideoInfo failed, exception="+e.getMessage());
+            LogUtils.w(TAG + " parseVideoInfo failed, exception="+e.getMessage());
         }
 
     }

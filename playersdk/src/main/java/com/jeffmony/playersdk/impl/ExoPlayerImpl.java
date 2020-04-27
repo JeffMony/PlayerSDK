@@ -20,7 +20,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoListener;
-import com.jeffmony.playersdk.LogUtis;
+import com.jeffmony.playersdk.LogUtils;
 import com.jeffmony.playersdk.PlayerParams;
 import com.jeffmony.playersdk.net.HttpEventListener;
 
@@ -226,7 +226,7 @@ public class ExoPlayerImpl extends PlayerImpl {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            LogUtis.d("onPlayerStateChanged playWhenReady="+playWhenReady+", playbackState="+playbackState);
+            LogUtils.d("onPlayerStateChanged playWhenReady="+playWhenReady+", playbackState="+playbackState);
             switch(playbackState) {
                 case Player.STATE_BUFFERING:
                     break;
@@ -252,7 +252,7 @@ public class ExoPlayerImpl extends PlayerImpl {
 
         @Override
         public void onIsPlayingChanged(boolean isPlaying) {
-            LogUtis.d("onIsPlayingChanged isPlaying="+isPlaying);
+            LogUtils.d("onIsPlayingChanged isPlaying="+isPlaying);
         }
     }
 

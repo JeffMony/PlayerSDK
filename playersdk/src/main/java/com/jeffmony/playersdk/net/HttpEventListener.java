@@ -2,7 +2,7 @@ package com.jeffmony.playersdk.net;
 
 import androidx.annotation.Nullable;
 
-import com.jeffmony.playersdk.LogUtis;
+import com.jeffmony.playersdk.LogUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -68,7 +68,7 @@ public class HttpEventListener extends EventListener {
         if (name.equalsIgnoreCase("callEnd") ||
                 name.equalsIgnoreCase("callFailed")) {
             // print http pipeline info.
-            LogUtis.w(sbLog.toString());
+            LogUtils.w(sbLog.toString());
         }
     }
 
