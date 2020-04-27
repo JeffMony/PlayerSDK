@@ -19,14 +19,16 @@ import android.widget.Toast;
 import com.jeffmony.orcode.CaptureActivity;
 import com.jeffmony.orcode.Intents;
 import com.jeffmony.playersdk.PlayerType;
+import com.jeffmony.playersdk.utils.HttpUtils;
 import com.jeffmony.playersdk.videoinfo.VideoInfoParserManager;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
-    public static final int REQUEST_CODE_SCAN = 0x01;
-    public static final int RC_CAMERA = 0x01;
+    public static final int REQUEST_CODE_SCAN = 1;
+    public static final int RC_CAMERA = 2;
+    public static final int RC_STORAGE = 3;
     public static final String KEY_TITLE = "key_title";
     public static final String KEY_IS_CONTINUOUS = "key_continuous_scan";
 
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean mIsContinuousScan;
     private PlayerType mPlayerType = PlayerType.EXO_PLAYER;
     private boolean mUseOkHttp = false;
+    private boolean mIsLoop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +78,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void checkCameraPermissions() {
         mIsContinuousScan = false;
-        String[] perms = {Manifest.permission.CAMERA};
-        if (EasyPermissions.hasPermissions(this, perms)) {//有权限
+        String[] permssions = { Manifest.permission.CAMERA };
+        if (EasyPermissions.hasPermissions(this, permssions)) {//有权限
             startScan(mCls, "扫码");
         } else {
             // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(this, getString(R.string.permission_camera),
-                    RC_CAMERA, perms);
+            EasyPermissions.requestPermissions(this, getString(R.string.permission_camera), RC_CAMERA, permssions);
+        }
+    }
+
+    private void checkStoragePermissions() {
+        String[] permssions = { Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, permssions)) {
+            playVideo();
+        } else {
+            EasyPermissions.requestPermissions(this, getString(R.string.permission_storage), RC_STORAGE, permssions);
         }
     }
 
@@ -97,9 +108,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK && data!=null) {
             switch (requestCode) {
-                case REQUEST_CODE_SCAN:
+                case RC_CAMERA:
                     String result = data.getStringExtra(Intents.Scan.RESULT);
                     mUrlText.setText(result);
+                    break;
+                case RC_STORAGE:
+                    playVideo();
                     break;
             }
         }
@@ -139,18 +153,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (TextUtils.isEmpty(url)) {
             Toast.makeText(this, R.string.url_tip, Toast.LENGTH_SHORT).show();
         } else {
-            Intent intent = new Intent(this, PlayerActivity.class);
-            intent.putExtra("video_url", url);
-            int type = 0;
-            if (mPlayerType == PlayerType.EXO_PLAYER) {
-                type = 1;
-            } else if (mPlayerType == PlayerType.IJK_PLAYER) {
-                type = 2;
+            mIsLoop = isLooping;
+            if (HttpUtils.isLocalFile(url)) {
+                checkStoragePermissions();
+            } else {
+                playVideo();
             }
-            intent.putExtra("player_type", type);
-            intent.putExtra("is_looping", isLooping);
-            intent.putExtra("use_okhttp", mUseOkHttp);
-            startActivity(intent);
         }
+    }
+
+    private void playVideo() {
+        String url = mUrlText.getText().toString();
+        Intent intent = new Intent(this, PlayerActivity.class);
+        intent.putExtra("video_url", url);
+        int type = 0;
+        if (mPlayerType == PlayerType.EXO_PLAYER) {
+            type = 1;
+        } else if (mPlayerType == PlayerType.IJK_PLAYER) {
+            type = 2;
+        }
+        intent.putExtra("player_type", type);
+        intent.putExtra("is_looping", mIsLoop);
+        intent.putExtra("use_okhttp", mUseOkHttp);
+        startActivity(intent);
     }
 }
