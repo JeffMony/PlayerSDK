@@ -19,24 +19,12 @@ public class PlayerImpl implements IPlayer {
     private OnPreparedListener mOnPreparedListener;
     private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
     private OnErrorListener mOnErrorListener;
+    private PlayerParams mParams;
 
-    private Context mContext;
     protected String mUrl;
 
-    protected String mOriginUrl;
-
-    //Player settings
-    protected boolean mVideoCacheSwitch = false;
-
-    private WeakHandler mHander = new WeakHandler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message msg) {
-            return true;
-        }
-    });
-
-    public PlayerImpl(Context context, PlayerParams attributes) {
-        mContext = context;
+    public PlayerImpl(Context context, PlayerParams params) {
+        mParams = params;
     }
 
     @Override

@@ -46,8 +46,16 @@
 
     <LinearLayout
         android:layout_margin="10dp"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
+
+        <Spinner
+            android:popupBackground="@color/colorPrimary"
+            android:id="@+id/speed_spinner"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/speed_btn1"

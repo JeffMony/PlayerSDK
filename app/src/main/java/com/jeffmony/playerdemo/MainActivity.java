@@ -18,9 +18,14 @@ import android.widget.Toast;
 
 import com.jeffmony.orcode.CaptureActivity;
 import com.jeffmony.orcode.Intents;
+import com.jeffmony.playersdk.LogUtils;
 import com.jeffmony.playersdk.PlayerType;
+import com.jeffmony.playersdk.callback.IVideoInfoCallback;
 import com.jeffmony.playersdk.utils.HttpUtils;
+import com.jeffmony.playersdk.videoinfo.M3U8Seg;
 import com.jeffmony.playersdk.videoinfo.VideoInfoParserManager;
+
+import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -137,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == mLoopBtn) {
             playWithLooping(true);
         } else if (v == mParseVideoBtn) {
-            VideoInfoParserManager.getInstance().parseVideoInfo(mUrlText.getText().toString());
+            VideoInfoParserManager.getInstance().parseVideoInfo(mUrlText.getText().toString(), mVideoInfoCallback);
         }
     }
 
@@ -177,4 +182,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("use_okhttp", mUseOkHttp);
         startActivity(intent);
     }
+
+    private IVideoInfoCallback mVideoInfoCallback = new IVideoInfoCallback() {
+
+        @Override
+        public void onVideoType(String contentType, String name) {
+
+        }
+
+        @Override
+        public void onMutipleVideo(List<M3U8Seg> urlList) {
+
+        }
+    };
 }

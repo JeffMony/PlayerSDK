@@ -9,10 +9,12 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,8 +26,13 @@ import com.jeffmony.playersdk.IPlayer;
 import com.jeffmony.playersdk.PlayerParams;
 import com.jeffmony.playersdk.PlayerType;
 import com.jeffmony.playersdk.WeakHandler;
+import com.jeffmony.playersdk.callback.IVideoInfoCallback;
 import com.jeffmony.playersdk.utils.ScreenUtils;
 import com.jeffmony.playersdk.utils.Utility;
+import com.jeffmony.playersdk.videoinfo.M3U8Seg;
+import com.jeffmony.playersdk.videoinfo.VideoInfoParserManager;
+
+import java.util.List;
 
 public class PlayerActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -38,6 +45,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private SeekBar mProgressView;
     private TextView mTimeView;
     private ImageButton mVideoStateBtn;
+    private Spinner mSpeedSpinner;
     private Button mSpeedBtn1;
     private Button mSpeedBtn2;
     private Button mSpeedBtn3;
@@ -54,29 +62,6 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private CommonPlayer mPlayer;
     private float mSpeed = 1.0f;
 
-    private WeakHandler mHandler = new WeakHandler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(@NonNull Message msg) {
-            if (msg.what == MSG_UPDATE_PROGRESS) {
-                updateVideoProgress();
-            }
-            return true;
-        }
-    });
-
-    private void updateVideoProgress() {
-        long currentPosition = mPlayer.getCurrentPosition();
-        long totalDuration = mTotalDuration;
-
-        String timeStr = Utility.getVideoTimeString(currentPosition) + "/" + Utility.getVideoTimeString(totalDuration);
-        mTimeView.setText(timeStr);
-        mTimeView.setVisibility(View.VISIBLE);
-        int progress = (int)(currentPosition * 1.0f / totalDuration * MAX_PROGRESS);
-        mProgressView.setProgress(progress);
-        mHandler.sendEmptyMessageDelayed(MSG_UPDATE_PROGRESS, INTERVAL);
-
-    }
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +72,9 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mIsLooping = getIntent().getBooleanExtra("is_looping", false);
         mUseOkHttp = getIntent().getBooleanExtra("use_okhttp", false);
         mScreenWidth = ScreenUtils.getScreenWidth(this);
+
+        VideoInfoParserManager.getInstance().parseVideoInfo(mUrl, mVideoInfoCallback);
+
         initViews();
     }
 
@@ -95,6 +83,15 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mProgressView = (SeekBar) findViewById(R.id.video_progress_view);
         mVideoStateBtn = (ImageButton) findViewById(R.id.video_state_btn);
         mTimeView = (TextView) findViewById(R.id.time_view);
+        mSpeedSpinner = (Spinner) findViewById(R.id.speed_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.speed_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpeedSpinner.setAdapter(adapter);
+
+
+
+
         mSpeedBtn1 = (Button) findViewById(R.id.speed_btn1);
         mSpeedBtn2 = (Button) findViewById(R.id.speed_btn2);
         mSpeedBtn3 = (Button) findViewById(R.id.speed_btn3);
@@ -110,6 +107,18 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mSpeedBtn4.setOnClickListener(this);
         mSpeedBtn5.setOnClickListener(this);
     }
+
+    private IVideoInfoCallback mVideoInfoCallback = new IVideoInfoCallback() {
+        @Override
+        public void onVideoType(String contentType, String name) {
+
+        }
+
+        @Override
+        public void onMutipleVideo(List<M3U8Seg> urlList) {
+
+        }
+    };
 
     private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
@@ -198,6 +207,29 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
     };
+
+    private WeakHandler mHandler = new WeakHandler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            if (msg.what == MSG_UPDATE_PROGRESS) {
+                updateVideoProgress();
+            }
+            return true;
+        }
+    });
+
+    private void updateVideoProgress() {
+        long currentPosition = mPlayer.getCurrentPosition();
+        long totalDuration = mTotalDuration;
+
+        String timeStr = Utility.getVideoTimeString(currentPosition) + "/" + Utility.getVideoTimeString(totalDuration);
+        mTimeView.setText(timeStr);
+        mTimeView.setVisibility(View.VISIBLE);
+        int progress = (int)(currentPosition * 1.0f / totalDuration * MAX_PROGRESS);
+        mProgressView.setProgress(progress);
+        mHandler.sendEmptyMessageDelayed(MSG_UPDATE_PROGRESS, INTERVAL);
+
+    }
 
     private void updateVideoSize(int width, int height) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height);

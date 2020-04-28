@@ -1,7 +1,16 @@
 package com.jeffmony.playersdk.videoinfo;
 
 import com.jeffmony.playersdk.LogUtils;
+import com.jeffmony.playersdk.callback.IVideoInfoCallback;
+import com.jeffmony.playersdk.component.HttpClientManager;
+import com.jeffmony.playersdk.thread.WorkerThreadManager;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.ConnectionPool;
@@ -26,18 +35,63 @@ public class VideoInfoParserManager {
         return sInstance;
     }
 
-    public void parseVideoInfo(String url) {
-        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        clientBuilder.connectionPool(new ConnectionPool(5, 5, TimeUnit.MINUTES));
-        OkHttpClient client = clientBuilder.build();
+    public void parseVideoInfo(String url, IVideoInfoCallback videoInfoCallback) {
+      if (videoInfoCallback == null) {
+        return;
+      }
+      WorkerThreadManager.submitRunnableTask(() -> {
         Request.Builder builder = new Request.Builder();
         builder.url(url);
         Response response = null;
         try {
-            response = client.newCall(builder.build()).execute();
-            LogUtils.i("parseVideoInfo code="+response.code());
+          response = HttpClientManager.getInstance().getClient().newCall(builder.build()).execute();
+          if (response != null) {
+            String contentType = response.header("content-type");
+            if (VideoType.isM3U8(contentType)) {
+              videoInfoCallback.onVideoType(contentType, VideoType.M3U8);
+              parseM3U8Info(url, response, videoInfoCallback);
+            }
+          }
         } catch (Exception e) {
-            LogUtils.w(TAG + " parseVideoInfo failed, exception="+e.getMessage());
+          LogUtils.w(TAG + " parseVideoInfo failed, exception="+e.getMessage());
+        } finally {
+          if (response != null) {
+            response.close();
+          }
+        }
+      });
+    }
+
+    private void parseM3U8Info(String url, Response response, IVideoInfoCallback videoInfoCallback) throws Exception {
+        M3U8 m3u8 = new M3U8(url);
+        String baseUrl = url.substring(0, url.lastIndexOf("/") + 1);
+        String hostUrl = url.substring(0, url.indexOf((new URL(url)).getPath()) + 1);
+        m3u8.setHostUrl(hostUrl);
+        m3u8.setBaseUrl(baseUrl);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.body().byteStream()));
+        List<M3U8Seg> mSegList = new ArrayList<>();
+        String line;
+        while((line = bufferedReader.readLine()) != null) {
+            if (line.startsWith("#EXT")) {
+                continue;
+            }
+            if (line.endsWith(".m3u8")) {
+                M3U8Seg seg;
+                if (line.startsWith("https") || line.startsWith("http")) {
+                    seg = new M3U8Seg(line);
+                } else if (line.startsWith("/")) {
+                    seg = new M3U8Seg(hostUrl + line.substring(1));
+                } else {
+                    seg = new M3U8Seg(baseUrl + line);
+                }
+                mSegList.add(seg);
+            }
+        }
+        m3u8.setCount(mSegList.size());
+        m3u8.setSegList(mSegList);
+        videoInfoCallback.onMutipleVideo(mSegList);
+        if (bufferedReader != null) {
+            bufferedReader.close();
         }
 
     }
