@@ -1,5 +1,8 @@
 package com.jeffmony.playersdk.videoinfo;
 
+import android.net.Uri;
+import android.text.TextUtils;
+
 import com.jeffmony.playersdk.LogUtils;
 import com.jeffmony.playersdk.callback.IVideoInfoCallback;
 import com.jeffmony.playersdk.component.HttpClientManager;
@@ -32,31 +35,31 @@ public class VideoInfoParserManager {
     }
 
     public void parseVideoInfo(String url, IVideoInfoCallback videoInfoCallback) {
-      if (videoInfoCallback == null) {
-        return;
-      }
-      WorkerThreadManager.submitRunnableTask(() -> {
-        Request.Builder builder = new Request.Builder();
-        builder.url(url);
-        Response response = null;
-        try {
-          response = HttpClientManager.getInstance().getClient().newCall(builder.build()).execute();
-          if (response != null) {
-            String contentType = response.header("content-type");
-            if (VideoType.isM3U8(contentType)) {
-              videoInfoCallback.onVideoType(contentType, VideoType.M3U8);
-              parseM3U8Info(url, response, videoInfoCallback);
-            }
-          }
-        } catch (Exception e) {
-          LogUtils.w(TAG + " parseVideoInfo failed, exception="+e.getMessage());
-          videoInfoCallback.onFailed(e);
-        } finally {
-          if (response != null) {
-            response.close();
-          }
+        if (videoInfoCallback == null || TextUtils.isEmpty(url)) {
+            return;
         }
-      });
+        WorkerThreadManager.submitRunnableTask(() -> {
+            Request.Builder builder = new Request.Builder();
+            builder.url(url);
+            Response response = null;
+            try {
+                response = HttpClientManager.getInstance().getClient().newCall(builder.build()).execute();
+                if (response != null) {
+                    String contentType = response.header("content-type");
+                    if (VideoType.isM3U8(contentType)) {
+                        videoInfoCallback.onVideoType(contentType, VideoType.M3U8);
+                        parseM3U8Info(url, response, videoInfoCallback);
+                    }
+                }
+            } catch (Exception e) {
+                LogUtils.w(TAG + " parseVideoInfo failed, exception="+e.getMessage());
+                videoInfoCallback.onFailed(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
     }
 
     private void parseM3U8Info(String url, Response response, IVideoInfoCallback videoInfoCallback) throws Exception {
