@@ -111,7 +111,7 @@ public interface IPlayer {
 ```
 
 #### demo示意图
-![](./files/test1.jpg)![](./files/test3.jpg)![](./files/test4.jpg)
+![](./files/test1.jpg)![](files/test2.jpg)![](files/test3.jpg)
 
 欢迎关注我的公众号JeffMony，我会持续为你带来音视频---算法---Android---python 方面的知识分享<br>
 ![](./files/JeffMony.jpg)
