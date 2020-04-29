@@ -55,10 +55,15 @@ public interface IPlayer {
 
     void setOnPreparedListener(OnPreparedListener listener);
 
-    void setOnVideoSizeChangedListener(
-            OnVideoSizeChangedListener listener);
+    void setOnVideoSizeChangedListener(OnVideoSizeChangedListener listener);
 
     void setOnErrorListener(OnErrorListener listener);
+
+    void setOnCompletionListener(OnCompletionListener listener);
+
+    interface OnCompletionListener {
+        void onCompletion(IPlayer mp);
+    }
 
     interface OnPreparedListener {
         void onPrepared(IPlayer mp);

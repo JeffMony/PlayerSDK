@@ -16,4 +16,12 @@ public class M3U8Seg {
   public String getUrl() {
     return mUrl;
   }
+
+  public void setResolution(String resolution) {
+    mResolution = resolution;
+  }
+
+  public String getResolution() {
+    return mResolution;
+  }
 }

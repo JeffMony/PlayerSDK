@@ -19,6 +19,7 @@ public class PlayerImpl implements IPlayer {
     private OnPreparedListener mOnPreparedListener;
     private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
     private OnErrorListener mOnErrorListener;
+    private OnCompletionListener mOnCompleteListener;
     private PlayerParams mParams;
 
     protected String mUrl;
@@ -58,17 +59,22 @@ public class PlayerImpl implements IPlayer {
 
     @Override
     public void setOnPreparedListener(OnPreparedListener listener) {
-        this.mOnPreparedListener = listener;
+        mOnPreparedListener = listener;
     }
 
     @Override
     public void setOnVideoSizeChangedListener(OnVideoSizeChangedListener listener) {
-        this.mOnVideoSizeChangedListener = listener;
+        mOnVideoSizeChangedListener = listener;
     }
 
     @Override
     public void setOnErrorListener(OnErrorListener listener) {
-        this.mOnErrorListener = listener;
+        mOnErrorListener = listener;
+    }
+
+    @Override
+    public void setOnCompletionListener(OnCompletionListener listener) {
+        mOnCompleteListener = listener;
     }
 
     @Override

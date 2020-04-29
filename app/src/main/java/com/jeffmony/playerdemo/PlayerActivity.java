@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.jeffmony.playersdk.CommonPlayer;
 import com.jeffmony.playersdk.IPlayer;
+import com.jeffmony.playersdk.LogUtils;
 import com.jeffmony.playersdk.PlayerParams;
 import com.jeffmony.playersdk.PlayerType;
 import com.jeffmony.playersdk.WeakHandler;
@@ -39,7 +40,8 @@ import java.util.List;
 public class PlayerActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private static final String TAG = PlayerActivity.class.getSimpleName();
-    private static final int MSG_UPDATE_PROGRESS = 0x1;
+    private static final int MSG_UPDATE_PROGRESS = 1;
+    private static final int MSG_MULTIPLE_VIDEO = 2;
     private static final int INTERVAL = 1000;
     private static final int MAX_PROGRESS = 1000;
 
@@ -60,7 +62,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private CommonPlayer mPlayer;
     private float mSpeed = 1.0f;
     private List<M3U8Seg> mSegList;
-    private String mResolution;
+    private int mResolutionPosition = -1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,7 +101,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void initVideoResolutions(List<M3U8Seg> urlList) {
-        if (urlList.size() == 0) {
+        if (urlList.size() == 0 || urlList.size() == 1) {
             mResolutionSpinner.setVisibility(View.GONE);
         } else {
             mResolutionSpinner.setVisibility(View.VISIBLE);
@@ -107,7 +109,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
             List<String> resolutionList = new ArrayList<>();
             resolutionList.add("清晰度");
             for(int index = 0; index < urlList.size(); index++) {
-                resolutionList.add(index+"");
+                resolutionList.add(urlList.get(index).getResolution());
             }
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, resolutionList);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -115,12 +117,8 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
             mResolutionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String itemString = parent.getItemAtPosition(position).toString();
-                    if ("0".equals(itemString) ||
-                            "1".equals(itemString) ||
-                            "2".equals(itemString) ||
-                            "3".equals(itemString)) {
-                        changeResolution(itemString);
+                    if (position > 0 && position <= mSegList.size()) {
+                        changeResolution(position);
                     }
                  }
 
@@ -132,10 +130,10 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    private void changeResolution(String itemString) {
-        if (!itemString.equals(mResolution)) {
-            int index = Integer.parseInt(itemString);
-            String url = mSegList.get(index).getUrl();
+    private void changeResolution(int position) {
+        if (mResolutionPosition != position) {
+            mResolutionPosition = position;
+            String url = mSegList.get(position - 1).getUrl();
             if (mPlayer.isPlaying()) {
                 mPlayer.reset();
                 try {
@@ -159,7 +157,17 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
 
         @Override
         public void onMutipleVideo(List<M3U8Seg> urlList) {
-            initVideoResolutions(urlList);
+            LogUtils.e("onMutipleVideo : size="+urlList.size());
+            Message message = Message.obtain();
+            message.what = MSG_MULTIPLE_VIDEO;
+            message.obj = urlList;
+            mHandler.sendMessage(message);
+        }
+
+        @Override
+        public void onFailed(Exception e) {
+            e.printStackTrace();
+            LogUtils.e("onFailed, e="+e.getMessage());
         }
     };
 
@@ -256,6 +264,9 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         public boolean handleMessage(@NonNull Message msg) {
             if (msg.what == MSG_UPDATE_PROGRESS) {
                 updateVideoProgress();
+            } else if (msg.what == MSG_MULTIPLE_VIDEO) {
+                List<M3U8Seg> urlList = (List<M3U8Seg>) msg.obj;
+                initVideoResolutions(urlList);
             }
             return true;
         }

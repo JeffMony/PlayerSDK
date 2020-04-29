@@ -82,6 +82,10 @@ public class CommonPlayer implements IPlayer {
         mPlayerImpl.setOnErrorListener(listener);
     }
 
+    @Override
+    public void setOnCompletionListener(OnCompletionListener listener) {
+        mPlayerImpl.setOnCompletionListener(listener);
+    }
 
     @Override
     public void prepareAsync() throws IllegalStateException {

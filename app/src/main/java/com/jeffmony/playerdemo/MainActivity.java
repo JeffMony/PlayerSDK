@@ -175,17 +175,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("use_okhttp", mUseOkHttp);
         startActivity(intent);
     }
-
-    private IVideoInfoCallback mVideoInfoCallback = new IVideoInfoCallback() {
-
-        @Override
-        public void onVideoType(String contentType, String name) {
-
-        }
-
-        @Override
-        public void onMutipleVideo(List<M3U8Seg> urlList) {
-
-        }
-    };
 }

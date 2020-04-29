@@ -50,6 +50,7 @@ public class VideoInfoParserManager {
           }
         } catch (Exception e) {
           LogUtils.w(TAG + " parseVideoInfo failed, exception="+e.getMessage());
+          videoInfoCallback.onFailed(e);
         } finally {
           if (response != null) {
             response.close();
@@ -65,10 +66,9 @@ public class VideoInfoParserManager {
         m3u8.setHostUrl(hostUrl);
         m3u8.setBaseUrl(baseUrl);
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.body().byteStream()));
-        List<M3U8Seg> mSegList = new ArrayList<>();
+        List<M3U8Seg> segList = new ArrayList<>();
         String line;
         while((line = bufferedReader.readLine()) != null) {
-            LogUtils.e("litianpeng : " + line);
             if (line.startsWith("#EXT")) {
                 continue;
             }
@@ -81,16 +81,38 @@ public class VideoInfoParserManager {
                 } else {
                     seg = new M3U8Seg(baseUrl + line);
                 }
-                mSegList.add(seg);
+                segList.add(seg);
             }
         }
-        m3u8.setCount(mSegList.size());
-        m3u8.setSegList(mSegList);
-        videoInfoCallback.onMutipleVideo(mSegList);
+
+        convertM3U8Seg(segList);
+
+        m3u8.setCount(segList.size());
+        m3u8.setSegList(segList);
+        videoInfoCallback.onMutipleVideo(segList);
         if (bufferedReader != null) {
             bufferedReader.close();
         }
 
+    }
+
+    private void convertM3U8Seg(List<M3U8Seg> segList) {
+        if (segList.size() == 0 || segList.size() == 1) {
+            return;
+        }
+        if (segList.size() == 2) {
+            segList.get(0).setResolution(M3U8Constants.RESOLUTION_1);
+            segList.get(1).setResolution(M3U8Constants.RESOLUTION_2);
+        } else if (segList.size() == 3) {
+            segList.get(0).setResolution(M3U8Constants.RESOLUTION_1);
+            segList.get(1).setResolution(M3U8Constants.RESOLUTION_2);
+            segList.get(2).setResolution(M3U8Constants.RESOLUTION_3);
+        } else if (segList.size() == 4) {
+            segList.get(0).setResolution(M3U8Constants.RESOLUTION_1);
+            segList.get(1).setResolution(M3U8Constants.RESOLUTION_2);
+            segList.get(2).setResolution(M3U8Constants.RESOLUTION_3);
+            segList.get(3).setResolution(M3U8Constants.RESOLUTION_4);
+        }
     }
 
 }
