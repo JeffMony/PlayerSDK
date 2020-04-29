@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -23,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.jeffmony.playersdk.CommonPlayer;
 import com.jeffmony.playersdk.IPlayer;
+import com.jeffmony.playersdk.LogUtils;
 import com.jeffmony.playersdk.PlayerParams;
 import com.jeffmony.playersdk.PlayerType;
 import com.jeffmony.playersdk.WeakHandler;
@@ -34,7 +36,7 @@ import com.jeffmony.playersdk.videoinfo.VideoInfoParserManager;
 
 import java.util.List;
 
-public class PlayerActivity extends AppCompatActivity implements View.OnClickListener {
+public class PlayerActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private static final String TAG = PlayerActivity.class.getSimpleName();
     private static final int MSG_UPDATE_PROGRESS = 0x1;
@@ -46,11 +48,6 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private TextView mTimeView;
     private ImageButton mVideoStateBtn;
     private Spinner mSpeedSpinner;
-    private Button mSpeedBtn1;
-    private Button mSpeedBtn2;
-    private Button mSpeedBtn3;
-    private Button mSpeedBtn4;
-    private Button mSpeedBtn5;
 
     private String mUrl;
     private int mScreenWidth;
@@ -88,24 +85,11 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
                 R.array.speed_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpeedSpinner.setAdapter(adapter);
-
-
-
-
-        mSpeedBtn1 = (Button) findViewById(R.id.speed_btn1);
-        mSpeedBtn2 = (Button) findViewById(R.id.speed_btn2);
-        mSpeedBtn3 = (Button) findViewById(R.id.speed_btn3);
-        mSpeedBtn4 = (Button) findViewById(R.id.speed_btn4);
-        mSpeedBtn5 = (Button) findViewById(R.id.speed_btn5);
+        mSpeedSpinner.setOnItemSelectedListener(this);
 
         mVideoView.setSurfaceTextureListener(mSurfaceTextureListener);
         mProgressView.setOnSeekBarChangeListener(mSeekBarChangeListener);
         mVideoStateBtn.setOnClickListener(this);
-        mSpeedBtn1.setOnClickListener(this);
-        mSpeedBtn2.setOnClickListener(this);
-        mSpeedBtn3.setOnClickListener(this);
-        mSpeedBtn4.setOnClickListener(this);
-        mSpeedBtn5.setOnClickListener(this);
     }
 
     private IVideoInfoCallback mVideoInfoCallback = new IVideoInfoCallback() {
@@ -271,44 +255,44 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    private void changeSpeed(float speed) {
-        if (mSpeed == speed)
-            return;
-        mSpeed = speed;
-        mSpeedBtn1.setTextColor(getResources().getColor(R.color.black));
-        mSpeedBtn2.setTextColor(getResources().getColor(R.color.black));
-        mSpeedBtn3.setTextColor(getResources().getColor(R.color.black));
-        mSpeedBtn4.setTextColor(getResources().getColor(R.color.black));
-        mSpeedBtn5.setTextColor(getResources().getColor(R.color.black));
-        mPlayer.setSpeed(speed);
-        if (speed == 0.75f) {
-            mSpeedBtn1.setTextColor(getResources().getColor(R.color.red));
-        } else if (speed == 1.0f) {
-            mSpeedBtn2.setTextColor(getResources().getColor(R.color.red));
-        } else if (speed == 1.25f) {
-            mSpeedBtn3.setTextColor(getResources().getColor(R.color.red));
-        } else if (speed ==1.5f) {
-            mSpeedBtn4.setTextColor(getResources().getColor(R.color.red));
-        } else if (speed == 2.0f) {
-            mSpeedBtn5.setTextColor(getResources().getColor(R.color.red));
+    private void changeSpeed(String speedString) {
+        if ("0.75X".equals(speedString)) {
+            mSpeed = 0.75f;
+        } else if ("1.0 X".equals(speedString)) {
+            mSpeed = 1.0f;
+        } else if ("1.25X".equals(speedString)) {
+            mSpeed = 1.25f;
+        } else if ("1.5 X".equals(speedString)) {
+            mSpeed = 1.5f;
+        } else if ("2.0 X".equals(speedString)) {
+            mSpeed = 2.0f;
         }
+        mPlayer.setSpeed(mSpeed);
     }
 
     @Override
     public void onClick(View v) {
         if (v == mVideoStateBtn) {
             updatePlayerState();
-        } else if (v == mSpeedBtn1) {
-            changeSpeed(0.75f);
-        } else if (v == mSpeedBtn2) {
-            changeSpeed(1.0f);
-        } else if (v == mSpeedBtn3) {
-            changeSpeed(1.25f);
-        } else if (v == mSpeedBtn4) {
-            changeSpeed(1.5f);
-        } else if (v == mSpeedBtn5) {
-            changeSpeed(2.0f);
         }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        String itemString = parent.getItemAtPosition(position).toString();
+        if ("0.75X".equals(itemString) ||
+                "1.0 X".equals(itemString) ||
+                "1.25X".equals(itemString) ||
+                "1.5 X".equals(itemString) ||
+                "1.5 X".equals(itemString) ||
+                "2.0 X".equals(itemString)) {
+            changeSpeed(itemString);
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 
     @Override

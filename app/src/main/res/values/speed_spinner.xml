@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="speed_array">
-        <item>倍速</item>
+        <item>倍  速</item>
         <item>0.75X</item>
-        <item>1.0X</item>
+        <item>1.0 X</item>
         <item>1.25X</item>
-        <item>1.5X</item>
-        <item>2.0X</item>
+        <item>1.5 X</item>
+        <item>2.0 X</item>
     </string-array>
 </resources>
