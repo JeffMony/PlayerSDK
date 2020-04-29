@@ -9,6 +9,7 @@ public class VideoType {
   public static String M3U8_5 = "application/x-mpeg";
 
   public static boolean isM3U8(String contentType) {
+    contentType = contentType.toLowerCase();
     return VideoType.M3U8_1.equals(contentType) ||
             VideoType.M3U8_2.equals(contentType) ||
             VideoType.M3U8_3.equals(contentType) ||

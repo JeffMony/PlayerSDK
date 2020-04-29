@@ -59,13 +59,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initViews() {
-        mUrlText = (EditText) findViewById(R.id.video_url_text);
-        mOrcodeBtn = (Button) findViewById(R.id.orcode_btn);
-        mPlayBtn = (Button) findViewById(R.id.play_btn);
-        mLoopBtn = (Button) findViewById(R.id.loop_btn);
-        mExoBtn = (RadioButton) findViewById(R.id.exo_btn);
-        mIjkBtn = (RadioButton) findViewById(R.id.ijk_btn);
-        mOkHttpBox = (CheckBox) findViewById(R.id.okhttp_box);
+        mUrlText = findViewById(R.id.video_url_text);
+        mOrcodeBtn = findViewById(R.id.orcode_btn);
+        mPlayBtn = findViewById(R.id.play_btn);
+        mLoopBtn = findViewById(R.id.loop_btn);
+        mExoBtn = findViewById(R.id.exo_btn);
+        mIjkBtn = findViewById(R.id.ijk_btn);
+        mOkHttpBox = findViewById(R.id.okhttp_box);
         mUrlText.setText("http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8");
 
         mExoBtn.setOnClickListener(this);

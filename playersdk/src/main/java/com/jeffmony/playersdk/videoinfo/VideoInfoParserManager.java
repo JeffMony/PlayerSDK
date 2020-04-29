@@ -46,6 +46,7 @@ public class VideoInfoParserManager {
                 response = HttpClientManager.getInstance().getClient().newCall(builder.build()).execute();
                 if (response != null) {
                     String contentType = response.header("content-type");
+                    LogUtils.e("litianpeng type="+contentType);
                     if (VideoType.isM3U8(contentType)) {
                         videoInfoCallback.onVideoType(contentType, VideoType.M3U8);
                         parseM3U8Info(url, response, videoInfoCallback);
@@ -72,6 +73,7 @@ public class VideoInfoParserManager {
         List<M3U8Seg> segList = new ArrayList<>();
         String line;
         while((line = bufferedReader.readLine()) != null) {
+            LogUtils.e("litianpeng : " + line);
             if (line.startsWith("#EXT")) {
                 continue;
             }
@@ -115,6 +117,12 @@ public class VideoInfoParserManager {
             segList.get(1).setResolution(M3U8Constants.RESOLUTION_2);
             segList.get(2).setResolution(M3U8Constants.RESOLUTION_3);
             segList.get(3).setResolution(M3U8Constants.RESOLUTION_4);
+        } else if (segList.size() == 5) {
+            segList.get(0).setResolution(M3U8Constants.RESOLUTION_1);
+            segList.get(1).setResolution(M3U8Constants.RESOLUTION_2);
+            segList.get(2).setResolution(M3U8Constants.RESOLUTION_3);
+            segList.get(3).setResolution(M3U8Constants.RESOLUTION_4);
+            segList.get(4).setResolution(M3U8Constants.RESOLUTION_5);
         }
     }
 

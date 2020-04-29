@@ -2,7 +2,7 @@ package com.jeffmony.playersdk.videoinfo;
 
 public class M3U8Seg {
   private String mUrl;
-  private String mResolution;
+  private String mResolution = "未知";
 
   public M3U8Seg(String url) {
     mUrl = url;
