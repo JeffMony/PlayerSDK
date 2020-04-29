@@ -10,13 +10,13 @@
 > * 支持针对HLS Master视频的切换清晰度功能
 
 #### 版本更新日志
-##### 1.0.0
+##### 2.0.0
 ```
 repositories {
     maven { url 'https://jitpack.io' }
 }
 
-implementation 'com.github.JeffMony:PlayerSDK:1.0.0'
+implementation 'com.github.JeffMony:PlayerSDK:2.0.0'
 ```
 
 #### 切换清晰度的接入
