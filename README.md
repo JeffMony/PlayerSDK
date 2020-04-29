@@ -7,6 +7,7 @@
 > * 支持二维码扫描网址功能
 > * 支持循环播放的功能
 > * 支持倍速的功能
+> * 支持针对HLS Master视频的切换清晰度功能
 
 #### 版本更新日志
 ##### 1.0.0
@@ -17,6 +18,18 @@ repositories {
 
 implementation 'com.github.JeffMony:PlayerSDK:1.0.0'
 ```
+
+#### 切换清晰度的接入
+```
+VideoInfoParserManager.getInstance().parseVideoInfo(mUrl, mVideoInfoCallback);
+
+public interface IVideoInfoCallback {
+  void onVideoType(String contentType, String name);
+  void onMutipleVideo(List<M3U8Seg> urlList);
+  void onFailed(Exception e);
+}
+```
+在onMutipleVideo(List<M3U8Seg> urlList)回调函数中会出现呈现的几个清晰度的片源
 
 #### PlayerSDK接入文档
 ```
@@ -98,7 +111,7 @@ public interface IPlayer {
 ```
 
 #### demo示意图
-![](./files/test1.jpg)![](./files/test2.jpg)
+![](./files/test1.jpg)![](./files/test3.jpg)![](./files/test4.jpg)
 
 欢迎关注我的公众号JeffMony，我会持续为你带来音视频---算法---Android---python 方面的知识分享<br>
 ![](./files/JeffMony.jpg)
