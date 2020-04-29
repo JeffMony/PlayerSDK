@@ -82,7 +82,11 @@ public class VideoInfoParserManager {
                 if (line.startsWith("https") || line.startsWith("http")) {
                     seg = new M3U8Seg(line);
                 } else if (line.startsWith("/")) {
-                    seg = new M3U8Seg(hostUrl + line.substring(1));
+                    int tempIndex = line.indexOf('/', 1);
+                    String tempUrl = line.substring(0, tempIndex);
+                    tempIndex = url.indexOf(tempUrl);
+                    tempUrl = url.substring(0, tempIndex) + line;
+                    seg = new M3U8Seg(tempUrl);
                 } else {
                     seg = new M3U8Seg(baseUrl + line);
                 }
