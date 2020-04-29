@@ -132,6 +132,12 @@ public class ExoPlayerImpl extends PlayerImpl {
     }
 
     @Override
+    public void reset() {
+        mPlayer.stop();
+        super.reset();
+    }
+
+    @Override
     public void release() {
         mPlayer.removeVideoListener(mVideoListener);
         mPlayer.removeListener(mEventListener);

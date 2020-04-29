@@ -93,6 +93,11 @@ public class PlayerImpl implements IPlayer {
     }
 
     @Override
+    public void reset() {
+
+    }
+
+    @Override
     public void release() {
     }
 

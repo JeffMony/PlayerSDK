@@ -141,6 +141,12 @@ public class IjkPlayerImpl extends PlayerImpl {
     }
 
     @Override
+    public void reset() {
+        mPlayer.reset();
+        super.reset();
+    }
+
+    @Override
     public void release() {
         mPlayer.release();
         super.release();

@@ -11,12 +11,12 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.jeffmony.playersdk.CommonPlayer;
 import com.jeffmony.playersdk.IPlayer;
-import com.jeffmony.playersdk.LogUtils;
 import com.jeffmony.playersdk.PlayerParams;
 import com.jeffmony.playersdk.PlayerType;
 import com.jeffmony.playersdk.WeakHandler;
@@ -34,6 +33,7 @@ import com.jeffmony.playersdk.utils.Utility;
 import com.jeffmony.playersdk.videoinfo.M3U8Seg;
 import com.jeffmony.playersdk.videoinfo.VideoInfoParserManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
@@ -48,6 +48,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private TextView mTimeView;
     private ImageButton mVideoStateBtn;
     private Spinner mSpeedSpinner;
+    private Spinner mResolutionSpinner;
 
     private String mUrl;
     private int mScreenWidth;
@@ -58,6 +59,8 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private Surface mSurface;
     private CommonPlayer mPlayer;
     private float mSpeed = 1.0f;
+    private List<M3U8Seg> mSegList;
+    private String mResolution;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,11 +79,14 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void initViews() {
-        mVideoView = (TextureView) findViewById(R.id.video_view);
-        mProgressView = (SeekBar) findViewById(R.id.video_progress_view);
-        mVideoStateBtn = (ImageButton) findViewById(R.id.video_state_btn);
-        mTimeView = (TextView) findViewById(R.id.time_view);
-        mSpeedSpinner = (Spinner) findViewById(R.id.speed_spinner);
+        mVideoView = findViewById(R.id.video_view);
+        mProgressView = findViewById(R.id.video_progress_view);
+        mVideoStateBtn = findViewById(R.id.video_state_btn);
+        mTimeView = findViewById(R.id.time_view);
+        mResolutionSpinner = findViewById(R.id.resolution_spinner);
+        mResolutionSpinner.setVisibility(View.GONE);
+
+        mSpeedSpinner = findViewById(R.id.speed_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.speed_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -92,6 +98,59 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mVideoStateBtn.setOnClickListener(this);
     }
 
+    private void initVideoResolutions(List<M3U8Seg> urlList) {
+        if (urlList.size() == 0) {
+            mResolutionSpinner.setVisibility(View.GONE);
+        } else {
+            mResolutionSpinner.setVisibility(View.VISIBLE);
+            mSegList = urlList;
+            List<String> resolutionList = new ArrayList<>();
+            resolutionList.add("清晰度");
+            for(int index = 0; index < urlList.size(); index++) {
+                resolutionList.add(index+"");
+            }
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, resolutionList);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mResolutionSpinner.setAdapter(adapter);
+            mResolutionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String itemString = parent.getItemAtPosition(position).toString();
+                    if ("0".equals(itemString) ||
+                            "1".equals(itemString) ||
+                            "2".equals(itemString) ||
+                            "3".equals(itemString)) {
+                        changeResolution(itemString);
+                    }
+                 }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+        }
+    }
+
+    private void changeResolution(String itemString) {
+        if (!itemString.equals(mResolution)) {
+            int index = Integer.parseInt(itemString);
+            String url = mSegList.get(index).getUrl();
+            if (mPlayer.isPlaying()) {
+                mPlayer.reset();
+                try {
+                    mPlayer.setDataSource(this, Uri.parse(url));
+                } catch (Exception e) {
+                    return;
+                }
+                mPlayer.setSurface(mSurface);
+                mPlayer.prepareAsync();
+            }
+        } else {
+            Toast.makeText(this, "正在观看", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private IVideoInfoCallback mVideoInfoCallback = new IVideoInfoCallback() {
         @Override
         public void onVideoType(String contentType, String name) {
@@ -100,7 +159,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
 
         @Override
         public void onMutipleVideo(List<M3U8Seg> urlList) {
-
+            initVideoResolutions(urlList);
         }
     };
 
@@ -220,38 +279,31 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mVideoView.setLayoutParams(params);
     }
 
-    private void updateVideoState() {
-        if (mPlayer.isPlaying()) {
-            mVideoStateBtn.setImageResource(R.mipmap.video_pause);
-        } else {
-            mVideoStateBtn.setImageResource(R.mipmap.video_play);
-        }
-    }
-
     private void updatePlayerState() {
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
+            mVideoStateBtn.setImageResource(R.mipmap.video_play);
             mHandler.removeMessages(MSG_UPDATE_PROGRESS);
         } else {
             mPlayer.start();
+            mVideoStateBtn.setImageResource(R.mipmap.video_pause);
             mHandler.sendEmptyMessage(MSG_UPDATE_PROGRESS);
         }
-        updateVideoState();
     }
 
     private void startPlayer() {
         if (!mPlayer.isPlaying()) {
             mPlayer.start();
+            mVideoStateBtn.setImageResource(R.mipmap.video_pause);
             mHandler.sendEmptyMessage(MSG_UPDATE_PROGRESS);
-            updateVideoState();
         }
     }
 
     private void pausePlayer() {
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
+            mVideoStateBtn.setImageResource(R.mipmap.video_play);
             mHandler.removeMessages(MSG_UPDATE_PROGRESS);
-            updateVideoState();
         }
     }
 

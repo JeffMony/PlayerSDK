@@ -37,6 +37,8 @@ public interface IPlayer {
 
     void setSpeed(float speed);
 
+    void reset();
+
     void release();
 
     void seekTo(long msec) throws IllegalStateException;

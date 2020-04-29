@@ -45,8 +45,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RadioButton mIjkBtn;
     private CheckBox mOkHttpBox;
 
-    private Button mParseVideoBtn;
-
     private Class<?> mCls;
     private boolean mIsContinuousScan;
     private PlayerType mPlayerType = PlayerType.EXO_PLAYER;
@@ -68,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mExoBtn = (RadioButton) findViewById(R.id.exo_btn);
         mIjkBtn = (RadioButton) findViewById(R.id.ijk_btn);
         mOkHttpBox = (CheckBox) findViewById(R.id.okhttp_box);
-        mParseVideoBtn = (Button) findViewById(R.id.parse_video_btn);
-
         mUrlText.setText("http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8");
 
         mExoBtn.setOnClickListener(this);
@@ -77,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mOrcodeBtn.setOnClickListener(this);
         mPlayBtn.setOnClickListener(this);
         mLoopBtn.setOnClickListener(this);
-        mParseVideoBtn.setOnClickListener(this);
         mOkHttpBox.setOnCheckedChangeListener(this);
     }
 
@@ -141,8 +136,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             playWithLooping(false);
         } else if (v == mLoopBtn) {
             playWithLooping(true);
-        } else if (v == mParseVideoBtn) {
-            VideoInfoParserManager.getInstance().parseVideoInfo(mUrlText.getText().toString(), mVideoInfoCallback);
         }
     }
 

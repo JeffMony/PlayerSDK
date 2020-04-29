@@ -7,14 +7,10 @@ import com.jeffmony.playersdk.thread.WorkerThreadManager;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.ConnectionPool;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -72,6 +68,7 @@ public class VideoInfoParserManager {
         List<M3U8Seg> mSegList = new ArrayList<>();
         String line;
         while((line = bufferedReader.readLine()) != null) {
+            LogUtils.e("litianpeng : " + line);
             if (line.startsWith("#EXT")) {
                 continue;
             }

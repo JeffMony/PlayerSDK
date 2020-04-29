@@ -109,6 +109,11 @@ public class CommonPlayer implements IPlayer {
     }
 
     @Override
+    public void reset() {
+        mPlayerImpl.reset();
+    }
+
+    @Override
     public void release() {
         mPlayerImpl.release();
     }
