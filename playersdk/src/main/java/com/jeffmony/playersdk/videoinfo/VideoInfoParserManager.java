@@ -46,7 +46,6 @@ public class VideoInfoParserManager {
                 response = HttpClientManager.getInstance().getClient().newCall(builder.build()).execute();
                 if (response != null) {
                     String contentType = response.header("content-type");
-                    LogUtils.e("litianpeng type="+contentType);
                     if (VideoType.isM3U8(contentType)) {
                         videoInfoCallback.onVideoType(contentType, VideoType.M3U8);
                         parseM3U8Info(url, response, videoInfoCallback);
@@ -73,7 +72,6 @@ public class VideoInfoParserManager {
         List<M3U8Seg> segList = new ArrayList<>();
         String line;
         while((line = bufferedReader.readLine()) != null) {
-            LogUtils.e("litianpeng : " + line);
             if (line.startsWith("#EXT")) {
                 continue;
             }

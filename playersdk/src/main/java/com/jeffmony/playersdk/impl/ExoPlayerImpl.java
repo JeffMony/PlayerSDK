@@ -6,15 +6,19 @@ import android.view.Surface;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.source.TrackGroup;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
@@ -231,6 +235,17 @@ public class ExoPlayerImpl extends PlayerImpl {
     private class PlayerEventListener implements Player.EventListener {
 
         @Override
+        public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+            for(int index =0; index < trackGroups.length; index++) {
+                TrackGroup group = trackGroups.get(index);
+                for (int jIndex = 0; jIndex < group.length; jIndex++) {
+                    Format format = group.getFormat(jIndex);
+                    LogUtils.e("onTracksChanged format=" + Format.toLogString(format));
+                }
+            }
+        }
+
+        @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             LogUtils.d("onPlayerStateChanged playWhenReady="+playWhenReady+", playbackState="+playbackState);
             switch(playbackState) {
@@ -279,4 +294,5 @@ public class ExoPlayerImpl extends PlayerImpl {
 
         }
     }
+
 }
