@@ -8,6 +8,7 @@
 > * 支持循环播放的功能
 > * 支持倍速的功能
 > * 支持针对HLS Master视频的切换清晰度功能
+> * 添加Player实例监控方法
 
 #### 版本更新日志
 ##### 2.0.0
@@ -18,6 +19,25 @@ repositories {
 
 implementation 'com.github.JeffMony:PlayerSDK:2.0.0'
 ```
+#### Player实例监控
+```
+PlayerConfig config = new PlayerManager.Builder().setLimitCount(6).buildConfig();
+PlayerManager.getInstance().initConfig(config);
+PlayerManager.getInstance().addGlobalPlayerInstanceListener(mListener);
+
+private IPlayerInstanceListener mListener = new IPlayerInstanceListener() {
+    @Override
+    public void onPlayerCount(int count) {
+        LogUtils.e("onPlayerCount count=" + count);
+    }
+
+    @Override
+    public void onExceedLimit() {
+        LogUtils.e("onExceedLimit report info");
+    }
+};
+```
+设置player实例限制是6个，如果超过6个，那么可以上报信息
 
 #### 切换清晰度的接入
 ```
