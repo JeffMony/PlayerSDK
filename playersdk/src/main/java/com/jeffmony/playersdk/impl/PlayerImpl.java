@@ -7,8 +7,10 @@ import android.os.Message;
 import android.view.Surface;
 
 import com.jeffmony.playersdk.IPlayer;
+import com.jeffmony.playersdk.LogUtils;
 import com.jeffmony.playersdk.PlayerParams;
 import com.jeffmony.playersdk.WeakHandler;
+import com.jeffmony.playersdk.manager.PlayerManager;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -26,6 +28,10 @@ public class PlayerImpl implements IPlayer {
 
     public PlayerImpl(Context context, PlayerParams params) {
         mParams = params;
+
+        int hashCode = hashCode();
+        String stack = LogUtils.getStackTraceString(new Throwable());
+        PlayerManager.getInstance().addPlayer(hashCode, stack);
     }
 
     @Override
@@ -105,6 +111,7 @@ public class PlayerImpl implements IPlayer {
 
     @Override
     public void release() {
+        PlayerManager.getInstance().removePlayer(hashCode());
     }
 
     @Override
@@ -156,5 +163,4 @@ public class PlayerImpl implements IPlayer {
             mOnErrorListener.onError(this, what, msg);
         }
     }
-
 }

@@ -33,4 +33,8 @@ public class LogUtils {
             Log.w(TAG, msg);
         }
     }
+
+    public static String getStackTraceString(Throwable e) {
+        return Log.getStackTraceString(e);
+    }
 }
