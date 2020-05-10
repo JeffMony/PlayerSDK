@@ -18,14 +18,8 @@ import android.widget.Toast;
 
 import com.jeffmony.orcode.CaptureActivity;
 import com.jeffmony.orcode.Intents;
-import com.jeffmony.playersdk.LogUtils;
 import com.jeffmony.playersdk.PlayerType;
-import com.jeffmony.playersdk.callback.IVideoInfoCallback;
 import com.jeffmony.playersdk.utils.HttpUtils;
-import com.jeffmony.playersdk.videoinfo.M3U8Seg;
-import com.jeffmony.playersdk.videoinfo.VideoInfoParserManager;
-
-import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -44,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RadioButton mExoBtn;
     private RadioButton mIjkBtn;
     private CheckBox mOkHttpBox;
+    private Button mGLPlayerBtn;
 
     private Class<?> mCls;
     private boolean mIsContinuousScan;
@@ -66,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mExoBtn = findViewById(R.id.exo_btn);
         mIjkBtn = findViewById(R.id.ijk_btn);
         mOkHttpBox = findViewById(R.id.okhttp_box);
+        mGLPlayerBtn = findViewById(R.id.gl_player_btn);
         mUrlText.setText("http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8");
 
         mExoBtn.setOnClickListener(this);
@@ -73,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mOrcodeBtn.setOnClickListener(this);
         mPlayBtn.setOnClickListener(this);
         mLoopBtn.setOnClickListener(this);
+        mGLPlayerBtn.setOnClickListener(this);
         mOkHttpBox.setOnCheckedChangeListener(this);
     }
 
@@ -136,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             playWithLooping(false);
         } else if (v == mLoopBtn) {
             playWithLooping(true);
+        } else if (v == mGLPlayerBtn) {
+            playWithGLView();
         }
     }
 
@@ -173,6 +172,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("player_type", type);
         intent.putExtra("is_looping", mIsLoop);
         intent.putExtra("use_okhttp", mUseOkHttp);
+        startActivity(intent);
+    }
+
+    private void playWithGLView() {
+        Intent intent = new Intent(this, MyGLPlayerActivity.class);
         startActivity(intent);
     }
 }
