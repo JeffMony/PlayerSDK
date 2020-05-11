@@ -43,20 +43,20 @@ public class SplitSquareVideoRenderer extends BaseVideoRenderer{
 
         float[] VERTEX_DATA = {
                 // X, Y, Z, U, V
-                -1.0f,-mCurHeight / 2, 0, curLeft, 0.f,
-                0.0f, -mCurHeight / 2, 0, curLeft + curWidth, 0.f,
-                -1.0f, mCurHeight / 2, 0, curLeft, 1.f,
-                0.0f,  mCurHeight / 2, 0, curLeft + curWidth, 1.f,
+                -1.0f,-mCurHeightRatio / 2, 0, curLeft, 0.f,
+                0.0f, -mCurHeightRatio / 2, 0, curLeft + curWidth, 0.f,
+                -1.0f, mCurHeightRatio / 2, 0, curLeft, 1.f,
+                0.0f,  mCurHeightRatio / 2, 0, curLeft + curWidth, 1.f,
         };
         return VERTEX_DATA;
     }
     public float[] getVideoRightVertexData(){
         float[] VERTEX_DATA = {
                 // X, Y, Z, U, V
-                0.0f, -mCurHeight / 2, 0, curLeft + 0.5f, 0.f,
-                1.0f, -mCurHeight / 2, 0, curLeft + curWidth + 0.5f, 0.f,
-                0.0f,  mCurHeight / 2, 0, curLeft + 0.5f, 1.f,
-                1.0f,  mCurHeight / 2, 0, curLeft + curWidth + 0.5f, 1.f,
+                0.0f, -mCurHeightRatio / 2, 0, curLeft + 0.5f, 0.f,
+                1.0f, -mCurHeightRatio / 2, 0, curLeft + curWidth + 0.5f, 0.f,
+                0.0f,  mCurHeightRatio / 2, 0, curLeft + 0.5f, 1.f,
+                1.0f,  mCurHeightRatio / 2, 0, curLeft + curWidth + 0.5f, 1.f,
         };
         return VERTEX_DATA;
     }
@@ -67,7 +67,7 @@ public class SplitSquareVideoRenderer extends BaseVideoRenderer{
 
             float new_width = mVideoHeight * 2;
             float HEIGHT_IN_PX = mVideoHeight * mSurfaceWidth / new_width;
-            mCurHeight = HEIGHT_IN_PX * 2.0f / mSurfaceHeight * 1.0f;
+            mCurHeightRatio = HEIGHT_IN_PX * 2.0f / mSurfaceHeight * 1.0f;
 
             if ( mVideoWidth > 2 * mVideoHeight){
                 // 3D side by side video

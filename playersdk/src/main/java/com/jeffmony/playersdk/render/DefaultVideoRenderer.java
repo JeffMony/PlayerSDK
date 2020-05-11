@@ -9,7 +9,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class DefaultVideoRenderer extends BaseVideoRenderer{
 
-    private static final String TAG = "DefaultVideoRenderer";
     private VideoRenderEngine mVideoEngine;
 
     public DefaultVideoRenderer(Context context) {

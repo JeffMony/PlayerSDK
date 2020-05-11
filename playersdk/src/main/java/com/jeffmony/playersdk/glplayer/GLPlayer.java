@@ -2,8 +2,8 @@ package com.jeffmony.playersdk.glplayer;
 
 import android.content.Context;
 import android.net.Uri;
+import android.opengl.GLSurfaceView;
 import android.view.Surface;
-import android.view.View;
 
 import com.jeffmony.playersdk.IPlayer;
 import com.jeffmony.playersdk.PlayerParams;
@@ -11,7 +11,6 @@ import com.jeffmony.playersdk.PlayerType;
 import com.jeffmony.playersdk.impl.ExoPlayerImpl;
 import com.jeffmony.playersdk.impl.IjkPlayerImpl;
 import com.jeffmony.playersdk.render.BaseVideoRenderer;
-import com.jeffmony.playersdk.render.DefaultVideoRenderer;
 import com.jeffmony.playersdk.view.VideoGLSurfaceView;
 
 import java.io.FileDescriptor;
@@ -20,24 +19,17 @@ import java.util.Map;
 public class GLPlayer {
 
     private IPlayer mPlayer;
-    private VideoGLSurfaceView mVideoView;
+    private BaseVideoRenderer mRenderer;
 
     public GLPlayer(Context context) {
-        this(context, new DefaultVideoRenderer(context));
+        this(context, PlayerType.EXO_PLAYER);
     }
 
-    public GLPlayer(Context context, BaseVideoRenderer renderer) {
-        this(context, renderer, PlayerType.EXO_PLAYER);
+    public GLPlayer(Context context, PlayerType type) {
+        this(context, type, null);
     }
 
-    public GLPlayer(Context context, BaseVideoRenderer renderer, PlayerType type) {
-        this(context, renderer, type, null);
-    }
-
-    public GLPlayer(Context context, BaseVideoRenderer renderer, PlayerType type, PlayerParams params) {
-        if (renderer == null) {
-            return;
-        }
+    public GLPlayer(Context context, PlayerType type, PlayerParams params) {
         if (type == PlayerType.EXO_PLAYER) {
             mPlayer = new ExoPlayerImpl(context, params);
         } else if (type == PlayerType.IJK_PLAYER) {
@@ -45,8 +37,11 @@ public class GLPlayer {
         } else {
             return;
         }
+    }
 
-        mVideoView = new VideoGLSurfaceView(context, renderer);
+    public void setRenderer(VideoGLSurfaceView glSurfaceView, BaseVideoRenderer renderer) {
+        glSurfaceView.setRendererEngine(renderer);
+        mRenderer = renderer;
         renderer.setGLPlayer(this);
     }
 
@@ -106,6 +101,14 @@ public class GLPlayer {
         mPlayer.setOnVideoSizeChangedListener(listener);
     }
 
+    public void updateVideoSize(int width, int height) {
+        mRenderer.updateVideoSize(width, height);
+    }
+
+    public void setOnPreparedListener(IPlayer.OnPreparedListener listener) {
+        mPlayer.setOnPreparedListener(listener);
+    }
+
     public void pause() {
         mPlayer.pause();
     }
@@ -122,8 +125,8 @@ public class GLPlayer {
         mPlayer.release();
     }
 
-    public View getVideoSurfaceView() {
-        return mVideoView;
+    public float getSurfaceHeightPx() {
+        return mRenderer.getSurfaceHeightPx();
     }
 
     public IPlayer getPlayer() {
