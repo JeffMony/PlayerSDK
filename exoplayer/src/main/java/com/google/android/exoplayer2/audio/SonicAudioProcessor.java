@@ -64,7 +64,6 @@ public final class SonicAudioProcessor implements AudioProcessor {
   private int pendingOutputSampleRate;
   private float speed;
   private float pitch;
-  private float volume;
 
   private AudioFormat pendingInputAudioFormat;
   private AudioFormat pendingOutputAudioFormat;
@@ -86,7 +85,6 @@ public final class SonicAudioProcessor implements AudioProcessor {
   public SonicAudioProcessor() {
     speed = 1f;
     pitch = 1f;
-    volume = 1f;
     pendingInputAudioFormat = AudioFormat.NOT_SET;
     pendingOutputAudioFormat = AudioFormat.NOT_SET;
     inputAudioFormat = AudioFormat.NOT_SET;
@@ -129,15 +127,6 @@ public final class SonicAudioProcessor implements AudioProcessor {
       pendingSonicRecreation = true;
     }
     return pitch;
-  }
-
-  public float setVolume(float volume) {
-    //volume range ?
-    if (this.volume != volume) {
-      this.volume = volume;
-      pendingSonicRecreation = true;
-    }
-    return volume;
   }
 
   /**
@@ -194,7 +183,6 @@ public final class SonicAudioProcessor implements AudioProcessor {
     return pendingOutputAudioFormat.sampleRate != Format.NO_VALUE
         && (Math.abs(speed - 1f) >= CLOSE_THRESHOLD
             || Math.abs(pitch - 1f) >= CLOSE_THRESHOLD
-            || Math.abs(volume - 1f) >= CLOSE_THRESHOLD
             || pendingOutputAudioFormat.sampleRate != pendingInputAudioFormat.sampleRate);
   }
 
@@ -256,7 +244,6 @@ public final class SonicAudioProcessor implements AudioProcessor {
                 inputAudioFormat.channelCount,
                 speed,
                 pitch,
-                volume,
                 outputAudioFormat.sampleRate);
       } else if (sonic != null) {
         sonic.flush();
@@ -272,7 +259,6 @@ public final class SonicAudioProcessor implements AudioProcessor {
   public void reset() {
     speed = 1f;
     pitch = 1f;
-    volume = 1f;
     pendingInputAudioFormat = AudioFormat.NOT_SET;
     pendingOutputAudioFormat = AudioFormat.NOT_SET;
     inputAudioFormat = AudioFormat.NOT_SET;

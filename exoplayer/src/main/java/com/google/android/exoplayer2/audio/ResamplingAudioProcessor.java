@@ -17,11 +17,21 @@ package com.google.android.exoplayer2.audio;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.util.Util;
 import java.nio.ByteBuffer;
 
 /**
- * An {@link AudioProcessor} that converts 8-bit, 24-bit and 32-bit integer PCM audio to 16-bit
- * integer PCM audio.
+ * An {@link AudioProcessor} that converts different PCM audio encodings to 16-bit integer PCM. The
+ * following encodings are supported as input:
+ *
+ * <ul>
+ *   <li>{@link C#ENCODING_PCM_8BIT}
+ *   <li>{@link C#ENCODING_PCM_16BIT} ({@link #isActive()} will return {@code false})
+ *   <li>{@link C#ENCODING_PCM_16BIT_BIG_ENDIAN}
+ *   <li>{@link C#ENCODING_PCM_24BIT}
+ *   <li>{@link C#ENCODING_PCM_32BIT}
+ *   <li>{@link C#ENCODING_PCM_FLOAT}
+ * </ul>
  */
 /* package */ final class ResamplingAudioProcessor extends BaseAudioProcessor {
 
@@ -33,7 +43,8 @@ import java.nio.ByteBuffer;
         && encoding != C.ENCODING_PCM_16BIT
         && encoding != C.ENCODING_PCM_16BIT_BIG_ENDIAN
         && encoding != C.ENCODING_PCM_24BIT
-        && encoding != C.ENCODING_PCM_32BIT) {
+        && encoding != C.ENCODING_PCM_32BIT
+        && encoding != C.ENCODING_PCM_FLOAT) {
       throw new UnhandledAudioFormatException(inputAudioFormat);
     }
     return encoding != C.ENCODING_PCM_16BIT
@@ -60,10 +71,10 @@ import java.nio.ByteBuffer;
         resampledSize = (size / 3) * 2;
         break;
       case C.ENCODING_PCM_32BIT:
+      case C.ENCODING_PCM_FLOAT:
         resampledSize = size / 2;
         break;
       case C.ENCODING_PCM_16BIT:
-      case C.ENCODING_PCM_FLOAT:
       case C.ENCODING_INVALID:
       case Format.NO_VALUE:
       default:
@@ -101,8 +112,20 @@ import java.nio.ByteBuffer;
           buffer.put(inputBuffer.get(i + 3));
         }
         break;
-      case C.ENCODING_PCM_16BIT:
       case C.ENCODING_PCM_FLOAT:
+        // 32 bit floating point -> 16 bit resampling. Floating point values are in the range
+        // [-1.0, 1.0], so need to be scaled by Short.MAX_VALUE.
+        for (int i = position; i < limit; i += 4) {
+          // Clamp to avoid integer overflow if the floating point values exceed their nominal range
+          // [Internal ref: b/161204847].
+          float floatValue =
+              Util.constrainValue(inputBuffer.getFloat(i), /* min= */ -1, /* max= */ 1);
+          short shortValue = (short) (floatValue * Short.MAX_VALUE);
+          buffer.put((byte) (shortValue & 0xFF));
+          buffer.put((byte) ((shortValue >> 8) & 0xFF));
+        }
+        break;
+      case C.ENCODING_PCM_16BIT:
       case C.ENCODING_INVALID:
       case Format.NO_VALUE:
       default:

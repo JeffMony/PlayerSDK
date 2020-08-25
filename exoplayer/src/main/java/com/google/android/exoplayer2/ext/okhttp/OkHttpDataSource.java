@@ -15,10 +15,10 @@
  */
 package com.google.android.exoplayer2.ext.okhttp;
 
+import static com.google.android.exoplayer2.util.Util.castNonNull;
+
 import android.net.Uri;
-
 import androidx.annotation.Nullable;
-
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.upstream.BaseDataSource;
@@ -28,7 +28,6 @@ import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.util.Predicate;
 import com.google.android.exoplayer2.util.Util;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +36,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import okhttp3.CacheControl;
 import okhttp3.Call;
 import okhttp3.HttpUrl;
@@ -46,8 +44,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-
-import static com.google.android.exoplayer2.util.Util.castNonNull;
 
 /**
  * An {@link HttpDataSource} that delegates to Square's {@link Call.Factory}.
@@ -227,7 +223,7 @@ public class OkHttpDataSource extends BaseDataSource implements HttpDataSource {
       responseByteStream = responseBody.byteStream();
     } catch (IOException e) {
       throw new HttpDataSourceException(
-          "Unable to connect to " + dataSpec.uri, e, dataSpec, HttpDataSourceException.TYPE_OPEN);
+          "Unable to connect", e, dataSpec, HttpDataSourceException.TYPE_OPEN);
     }
 
     int responseCode = response.code();

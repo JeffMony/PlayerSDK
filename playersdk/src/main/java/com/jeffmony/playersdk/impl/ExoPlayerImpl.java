@@ -68,8 +68,8 @@ public class ExoPlayerImpl extends PlayerImpl {
 
     @Override
     public void setSonicVolume(float volume) {
-        PlaybackParameters parameters = new PlaybackParameters(1f, 1f, volume);
-        mPlayer.setPlaybackParameters(parameters);
+//        PlaybackParameters parameters = new PlaybackParameters(1f, 1f, volume);
+//        mPlayer.setPlaybackParameters(parameters);
     }
 
     @Override
