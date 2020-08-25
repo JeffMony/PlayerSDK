@@ -38,6 +38,11 @@ public class CommonPlayer implements IPlayer {
     }
 
     @Override
+    public void setSonicVolume(float volume) {
+        mPlayerImpl.setSonicVolume(volume);
+    }
+
+    @Override
     public void setDataSource(String path) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
         mPlayerImpl.setDataSource(path);
     }

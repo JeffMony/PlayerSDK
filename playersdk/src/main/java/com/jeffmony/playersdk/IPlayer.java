@@ -27,6 +27,8 @@ public interface IPlayer {
 
     void setSurface(Surface surface);
 
+    void setSonicVolume(float volume);
+
     void prepareAsync() throws IllegalStateException;
 
     void start() throws IllegalStateException;

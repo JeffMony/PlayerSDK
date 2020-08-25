@@ -67,6 +67,12 @@ public class ExoPlayerImpl extends PlayerImpl {
     }
 
     @Override
+    public void setSonicVolume(float volume) {
+        PlaybackParameters parameters = new PlaybackParameters(1f, 1f, volume);
+        mPlayer.setPlaybackParameters(parameters);
+    }
+
+    @Override
     public void setDataSource(FileDescriptor fd, long offset, long length) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
     }
 

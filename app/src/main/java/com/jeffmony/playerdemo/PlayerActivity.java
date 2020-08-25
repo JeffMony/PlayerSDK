@@ -210,6 +210,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
             Log.w(TAG, "setDataSource failed, exception = " + e.getMessage());
             return;
         }
+        mPlayer.setSonicVolume(2f);
         mPlayer.setLooping(mIsLooping);
         mPlayer.setSurface(mSurface);
         mPlayer.setOnPreparedListener(mPrepareListener);

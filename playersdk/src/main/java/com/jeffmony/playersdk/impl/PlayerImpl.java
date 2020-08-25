@@ -35,6 +35,11 @@ public class PlayerImpl implements IPlayer {
     }
 
     @Override
+    public void setSonicVolume(float volume) {
+
+    }
+
+    @Override
     public void setDataSource(Context context, Uri uri, Map<String, String> headers) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
 
     }

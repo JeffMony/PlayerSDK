@@ -36,6 +36,7 @@ import java.util.Arrays;
   private final int channelCount;
   private final float speed;
   private final float pitch;
+  private final float volume;
   private final float rate;
   private final int minPeriod;
   private final int maxPeriod;
@@ -66,11 +67,12 @@ import java.util.Arrays;
    * @param outputSampleRateHz The sample rate for output audio, in hertz.
    */
   public Sonic(
-      int inputSampleRateHz, int channelCount, float speed, float pitch, int outputSampleRateHz) {
+      int inputSampleRateHz, int channelCount, float speed, float pitch, float volume, int outputSampleRateHz) {
     this.inputSampleRateHz = inputSampleRateHz;
     this.channelCount = channelCount;
     this.speed = speed;
     this.pitch = pitch;
+    this.volume = volume;
     rate = (float) inputSampleRateHz / outputSampleRateHz;
     minPeriod = inputSampleRateHz / MAXIMUM_PITCH;
     maxPeriod = inputSampleRateHz / MINIMUM_PITCH;
@@ -478,6 +480,30 @@ import java.util.Arrays;
     }
     if (r != 1.0f) {
       adjustRate(r, originalOutputFrameCount);
+    }
+    if(volume != 1.0f) {
+      // Adjust output volume.
+      scaleSamples(outputBuffer, originalOutputFrameCount, outputFrameCount - originalOutputFrameCount,
+              volume);
+    }
+  }
+
+  private void scaleSamples(short samples[],
+                            int position,
+                            int numSamples,
+                            float volume) {
+    int fixedPointVolume = (int)(volume * 4096.0f);
+    int start = position * channelCount;
+    int stop = start + numSamples * channelCount;
+
+    for(int xSample = start; xSample < stop; xSample++) {
+      int value = (samples[xSample] * fixedPointVolume) >> 12;
+      if(value > 32767) {
+        value = 32767;
+      } else if(value < -32767) {
+        value = -32767;
+      }
+      samples[xSample] = (short)value;
     }
   }
 
