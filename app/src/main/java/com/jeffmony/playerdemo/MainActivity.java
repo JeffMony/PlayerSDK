@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RadioButton mIjkBtn;
     private CheckBox mOkHttpBox;
     private Button mGLPlayerBtn;
+    private Button mCustomGlBtn;
 
     private Class<?> mCls;
     private boolean mIsContinuousScan;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mIjkBtn = findViewById(R.id.ijk_btn);
         mOkHttpBox = findViewById(R.id.okhttp_box);
         mGLPlayerBtn = findViewById(R.id.gl_player_btn);
+        mCustomGlBtn = findViewById(R.id.cutome_gl_btn);
         //http://videocdn.mviplay.cn/video/283665.mp4
         //http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8
         mUrlText.setText("http://videocdn.mviplay.cn/video/283665.mp4");
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPlayBtn.setOnClickListener(this);
         mLoopBtn.setOnClickListener(this);
         mGLPlayerBtn.setOnClickListener(this);
+        mCustomGlBtn.setOnClickListener(this);
         mOkHttpBox.setOnCheckedChangeListener(this);
     }
 
@@ -137,6 +140,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             playWithLooping(true);
         } else if (v == mGLPlayerBtn) {
             playWithGLView();
+        } else if (v == mCustomGlBtn) {
+            Intent intent = new Intent(MainActivity.this, CustomGLViewActivity.class);
+            startActivity(intent);
         }
     }
 

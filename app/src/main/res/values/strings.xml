@@ -3,4 +3,5 @@
     <string name="permission_camera">App扫码需要用到拍摄权限</string>
     <string name="permission_storage">播放本地视频需要存储权限</string>
     <string name="url_tip">请输入url</string>
+    <string name="error_protected_content_extension_not_supported">The GL protected content extension is not supported.</string>
 </resources>

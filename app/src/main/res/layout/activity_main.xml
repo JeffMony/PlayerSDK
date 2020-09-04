@@ -90,7 +90,8 @@
                 android:layout_height="wrap_content" />
 
             <Button
-                android:visibility="invisible"
+                android:id="@+id/cutome_gl_btn"
+                android:text="播放水印"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:layout_weight="1"
