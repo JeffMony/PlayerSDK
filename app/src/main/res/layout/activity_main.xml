@@ -84,7 +84,7 @@
             <Button
                 android:id="@+id/gl_player_btn"
                 android:layout_marginRight="5dp"
-                android:text="OpenGL渲染"
+                android:text="GL渲染"
                 android:layout_weight="1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

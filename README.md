@@ -11,6 +11,7 @@
 > * 添加Player实例监控方法
 > * 支持GLSurfaceView渲染视频
 > * 播放时调整声音大小
+> * 播放视频加水印
 
 #### 版本更新日志
 ##### 2.0.0
@@ -77,6 +78,9 @@ mPlayer.prepareAsync();
 
 #### demo示意图
 ![](./files/test1.jpg)![](files/test2.jpg)![](files/test3.jpg)
+
+#### 播放视频加水印
+![](./files/test4.jpg)
 
 欢迎关注我的公众号JeffMony，我会持续为你带来音视频---算法---Android---python 方面的知识分享<br>
 ![](./files/JeffMony.jpg)
