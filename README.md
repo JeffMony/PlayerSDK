@@ -10,6 +10,7 @@
 > * 支持针对HLS Master视频的切换清晰度功能
 > * 添加Player实例监控方法
 > * 支持GLSurfaceView渲染视频
+> * 播放时调整声音大小
 
 #### 版本更新日志
 ##### 2.0.0
@@ -20,6 +21,16 @@ repositories {
 
 implementation 'com.github.JeffMony:PlayerSDK:2.0.0'
 ```
+
+#### 播放时设置声音音量
+这里的调整音量不是让用户操作按键，而是在播放过程中调整声音的振幅。
+```
+//将声音的振幅调整为原来的3倍
+mPlayer.setSonicVolume(3f)
+```
+调整声音振幅使用Sonic库来实现。
+
+
 #### Player实例监控
 ```
 PlayerConfig config = new PlayerManager.Builder().setLimitCount(6).buildConfig();
@@ -63,73 +74,6 @@ mPlayer.prepareAsync();
 ```
 
 设置接口层是IPlayer.java
-```java
-public interface IPlayer {
-
-    void setDataSource(Context context, Uri uri)
-            throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
-
-    void setDataSource(String path)
-            throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
-
-    void setDataSource(Context context, Uri uri, Map<String, String> headers)
-            throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
-
-    void setDataSource(FileDescriptor fd)
-            throws IOException, IllegalArgumentException, IllegalStateException;
-
-    void setDataSource(FileDescriptor fd, long offset, long length)
-            throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
-
-    void setSurface(Surface surface);
-
-    void prepareAsync() throws IllegalStateException;
-
-    void start() throws IllegalStateException;
-
-    void stop() throws IllegalStateException;
-
-    void pause() throws IllegalStateException;
-
-    void setSpeed(float speed);
-
-    void release();
-
-    void seekTo(long msec) throws IllegalStateException;
-
-    void setLooping(boolean isLooping);
-
-    boolean isLooping();
-
-    long getCurrentPosition();
-
-    long getDuration();
-
-    boolean isPlaying();
-
-    void setOnPreparedListener(OnPreparedListener listener);
-
-    void setOnVideoSizeChangedListener(
-            OnVideoSizeChangedListener listener);
-
-    void setOnErrorListener(OnErrorListener listener);
-
-    interface OnPreparedListener {
-        void onPrepared(IPlayer mp);
-    }
-
-    interface OnVideoSizeChangedListener {
-        void onVideoSizeChanged(IPlayer mp, int width, int height,
-                                int rotationDegree,
-                                float pixelRatio,
-                                float darRatio);
-    }
-
-    interface OnErrorListener {
-        void onError(IPlayer mp, int what, String msg);
-    }
-}
-```
 
 #### demo示意图
 ![](./files/test1.jpg)![](files/test2.jpg)![](files/test3.jpg)
