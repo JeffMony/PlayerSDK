@@ -1,0 +1,250 @@
+commit 1773581c90538a761f661fa23a3b75dd567c909e
+Author: JeffMony <jeffmony@163.com>
+Date:   Tue Sep 8 22:12:50 2020 +0800
+
+    [New Feature]:Change the video volume when playing the video by adjusting the sound amplitude
+    
+    Signed-off-by: JeffMony <jeffmony@163.com>
+
+diff --git a/library/core/src/main/java/com/google/android/exoplayer2/PlaybackParameters.java b/library/core/src/main/java/com/google/android/exoplayer2/PlaybackParameters.java
+index 7dcd6f80a..7e7f4da28 100644
+--- a/library/core/src/main/java/com/google/android/exoplayer2/PlaybackParameters.java
++++ b/library/core/src/main/java/com/google/android/exoplayer2/PlaybackParameters.java
+@@ -31,6 +31,8 @@ public final class PlaybackParameters {
+   /** The factor by which pitch will be shifted. */
+   public final float pitch;
+ 
++  public final float volume;
++
+   private final int scaledUsPerMs;
+ 
+   /**
+@@ -40,7 +42,7 @@ public final class PlaybackParameters {
+    * @param speed The factor by which playback will be sped up. Must be greater than zero.
+    */
+   public PlaybackParameters(float speed) {
+-    this(speed, /* pitch= */ 1f);
++    this(speed, /* pitch= */ 1f, 1f);
+   }
+ 
+   /**
+@@ -51,11 +53,13 @@ public final class PlaybackParameters {
+    *     zero. Useful values are {@code 1} (to time-stretch audio) and the same value as passed in
+    *     as the {@code speed} (to resample audio, which is useful for slow-motion videos).
+    */
+-  public PlaybackParameters(float speed, float pitch) {
++  public PlaybackParameters(float speed, float pitch, float volume) {
+     Assertions.checkArgument(speed > 0);
+     Assertions.checkArgument(pitch > 0);
++    Assertions.checkArgument(volume > 0);
+     this.speed = speed;
+     this.pitch = pitch;
++    this.volume = volume;
+     scaledUsPerMs = Math.round(speed * 1000f);
+   }
+ 
+@@ -79,7 +83,7 @@ public final class PlaybackParameters {
+       return false;
+     }
+     PlaybackParameters other = (PlaybackParameters) obj;
+-    return this.speed == other.speed && this.pitch == other.pitch;
++    return this.speed == other.speed && this.pitch == other.pitch && this.volume == other.volume;
+   }
+ 
+   @Override
+@@ -87,11 +91,12 @@ public final class PlaybackParameters {
+     int result = 17;
+     result = 31 * result + Float.floatToRawIntBits(speed);
+     result = 31 * result + Float.floatToRawIntBits(pitch);
++    result = 31 * result + Float.floatToRawIntBits(volume);
+     return result;
+   }
+ 
+   @Override
+   public String toString() {
+-    return Util.formatInvariant("PlaybackParameters(speed=%.2f, pitch=%.2f)", speed, pitch);
++    return Util.formatInvariant("PlaybackParameters(speed=%.2f, pitch=%.2f, volume=%.2f)", speed, pitch, volume);
+   }
+ }
+diff --git a/library/core/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java b/library/core/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java
+index 787946d6a..a49c3ec6b 100644
+--- a/library/core/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java
++++ b/library/core/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java
+@@ -1042,7 +1042,7 @@ public class SimpleExoPlayer extends BasePlayer
+     PlaybackParameters playbackParameters;
+     if (params != null) {
+       params.allowDefaults();
+-      playbackParameters = new PlaybackParameters(params.getSpeed(), params.getPitch());
++      playbackParameters = new PlaybackParameters(params.getSpeed(), params.getPitch(), 1f);
+     } else {
+       playbackParameters = null;
+     }
+diff --git a/library/core/src/main/java/com/google/android/exoplayer2/audio/DefaultAudioSink.java b/library/core/src/main/java/com/google/android/exoplayer2/audio/DefaultAudioSink.java
+index 1e04b1e8d..98b5ea477 100644
+--- a/library/core/src/main/java/com/google/android/exoplayer2/audio/DefaultAudioSink.java
++++ b/library/core/src/main/java/com/google/android/exoplayer2/audio/DefaultAudioSink.java
+@@ -174,7 +174,8 @@ public final class DefaultAudioSink implements AudioSink {
+     public PlaybackParameters applyPlaybackParameters(PlaybackParameters playbackParameters) {
+       float speed = sonicAudioProcessor.setSpeed(playbackParameters.speed);
+       float pitch = sonicAudioProcessor.setPitch(playbackParameters.pitch);
+-      return new PlaybackParameters(speed, pitch);
++      float volume = sonicAudioProcessor.setVolume(playbackParameters.volume);
++      return new PlaybackParameters(speed, pitch, volume);
+     }
+ 
+     @Override
+@@ -205,6 +206,10 @@ public final class DefaultAudioSink implements AudioSink {
+   /** The maximum allowed pitch factor. Higher values will be constrained to fall in range. */
+   public static final float MAX_PITCH = 8f;
+ 
++  public static final float MIN_VOLUME = 0.1f;
++
++  public static final float MAX_VOLUME = 8F;
++
+   /** The default skip silence flag. */
+   private static final boolean DEFAULT_SKIP_SILENCE = false;
+ 
+@@ -1022,7 +1027,8 @@ public final class DefaultAudioSink implements AudioSink {
+     playbackParameters =
+         new PlaybackParameters(
+             Util.constrainValue(playbackParameters.speed, MIN_PLAYBACK_SPEED, MAX_PLAYBACK_SPEED),
+-            Util.constrainValue(playbackParameters.pitch, MIN_PITCH, MAX_PITCH));
++            Util.constrainValue(playbackParameters.pitch, MIN_PITCH, MAX_PITCH),
++            Util.constrainValue(playbackParameters.volume, MIN_VOLUME, MAX_VOLUME));
+     if (enableAudioTrackPlaybackParams && Util.SDK_INT >= 23) {
+       setAudioTrackPlaybackParametersV23(playbackParameters);
+     } else {
+@@ -1276,7 +1282,7 @@ public final class DefaultAudioSink implements AudioSink {
+       // Update the speed using the actual effective speed from the audio track.
+       audioTrackPlaybackParameters =
+           new PlaybackParameters(
+-              audioTrack.getPlaybackParams().getSpeed(), audioTrack.getPlaybackParams().getPitch());
++              audioTrack.getPlaybackParams().getSpeed(), audioTrack.getPlaybackParams().getPitch(), audioTrackPlaybackParameters.volume);
+       audioTrackPositionTracker.setAudioTrackPlaybackSpeed(audioTrackPlaybackParameters.speed);
+     }
+     this.audioTrackPlaybackParameters = audioTrackPlaybackParameters;
+diff --git a/library/core/src/main/java/com/google/android/exoplayer2/audio/Sonic.java b/library/core/src/main/java/com/google/android/exoplayer2/audio/Sonic.java
+index ae65eacd1..aff05f335 100644
+--- a/library/core/src/main/java/com/google/android/exoplayer2/audio/Sonic.java
++++ b/library/core/src/main/java/com/google/android/exoplayer2/audio/Sonic.java
+@@ -38,6 +38,7 @@ import java.util.Arrays;
+   private final int channelCount;
+   private final float speed;
+   private final float pitch;
++  private final float volume;
+   private final float rate;
+   private final int minPeriod;
+   private final int maxPeriod;
+@@ -65,14 +66,16 @@ import java.util.Arrays;
+    * @param channelCount The number of channels in the input audio.
+    * @param speed The speedup factor for output audio.
+    * @param pitch The pitch factor for output audio.
++   * @param volume
+    * @param outputSampleRateHz The sample rate for output audio, in hertz.
+    */
+   public Sonic(
+-      int inputSampleRateHz, int channelCount, float speed, float pitch, int outputSampleRateHz) {
++      int inputSampleRateHz, int channelCount, float speed, float pitch, float volume, int outputSampleRateHz) {
+     this.inputSampleRateHz = inputSampleRateHz;
+     this.channelCount = channelCount;
+     this.speed = speed;
+     this.pitch = pitch;
++    this.volume = volume;
+     rate = (float) inputSampleRateHz / outputSampleRateHz;
+     minPeriod = inputSampleRateHz / MAXIMUM_PITCH;
+     maxPeriod = inputSampleRateHz / MINIMUM_PITCH;
+@@ -481,6 +484,30 @@ import java.util.Arrays;
+     if (r != 1.0f) {
+       adjustRate(r, originalOutputFrameCount);
+     }
++    if(volume != 1.0f) {
++      // Adjust output volume.
++      scaleSamples(outputBuffer, originalOutputFrameCount, outputFrameCount - originalOutputFrameCount,
++          volume);
++    }
++  }
++
++  private void scaleSamples(short samples[],
++      int position,
++      int numSamples,
++      float volume) {
++    int fixedPointVolume = (int) (volume * 4096.0f);
++    int start = position * channelCount;
++    int stop = start + numSamples * channelCount;
++
++    for (int xSample = start; xSample < stop; xSample++) {
++      int value = (samples[xSample] * fixedPointVolume) >> 12;
++      if (value > 32767) {
++        value = 32767;
++      } else if (value < -32767) {
++        value = -32767;
++      }
++      samples[xSample] = (short) value;
++    }
+   }
+ 
+   private static void overlapAdd(
+diff --git a/library/core/src/main/java/com/google/android/exoplayer2/audio/SonicAudioProcessor.java b/library/core/src/main/java/com/google/android/exoplayer2/audio/SonicAudioProcessor.java
+index 5c3c1db0c..690cb66d3 100644
+--- a/library/core/src/main/java/com/google/android/exoplayer2/audio/SonicAudioProcessor.java
++++ b/library/core/src/main/java/com/google/android/exoplayer2/audio/SonicAudioProcessor.java
+@@ -44,6 +44,7 @@ public final class SonicAudioProcessor implements AudioProcessor {
+   private int pendingOutputSampleRate;
+   private float speed;
+   private float pitch;
++  private float volume;
+ 
+   private AudioFormat pendingInputAudioFormat;
+   private AudioFormat pendingOutputAudioFormat;
+@@ -63,6 +64,7 @@ public final class SonicAudioProcessor implements AudioProcessor {
+   public SonicAudioProcessor() {
+     speed = 1f;
+     pitch = 1f;
++    volume = 1f;
+     pendingInputAudioFormat = AudioFormat.NOT_SET;
+     pendingOutputAudioFormat = AudioFormat.NOT_SET;
+     inputAudioFormat = AudioFormat.NOT_SET;
+@@ -105,6 +107,19 @@ public final class SonicAudioProcessor implements AudioProcessor {
+     return pitch;
+   }
+ 
++  /**
++   *
++   * @param volume The requested new volume
++   * @return The actual new volume
++   */
++  public float setVolume(float volume) {
++    if (this.volume != volume) {
++      this.volume = volume;
++      pendingSonicRecreation = true;
++    }
++    return volume;
++  }
++
+   /**
+    * Sets the sample rate for output audio, in Hertz. Pass {@link #SAMPLE_RATE_NO_CHANGE} to output
+    * audio at the same sample rate as the input. After calling this method, call {@link
+@@ -159,6 +174,7 @@ public final class SonicAudioProcessor implements AudioProcessor {
+     return pendingOutputAudioFormat.sampleRate != Format.NO_VALUE
+         && (Math.abs(speed - 1f) >= CLOSE_THRESHOLD
+             || Math.abs(pitch - 1f) >= CLOSE_THRESHOLD
++            || Math.abs(volume - 1f) >= CLOSE_THRESHOLD
+             || pendingOutputAudioFormat.sampleRate != pendingInputAudioFormat.sampleRate);
+   }
+ 
+@@ -220,6 +236,7 @@ public final class SonicAudioProcessor implements AudioProcessor {
+                 inputAudioFormat.channelCount,
+                 speed,
+                 pitch,
++                volume,
+                 outputAudioFormat.sampleRate);
+       } else if (sonic != null) {
+         sonic.flush();
+@@ -235,6 +252,7 @@ public final class SonicAudioProcessor implements AudioProcessor {
+   public void reset() {
+     speed = 1f;
+     pitch = 1f;
++    volume = 1f;
+     pendingInputAudioFormat = AudioFormat.NOT_SET;
+     pendingOutputAudioFormat = AudioFormat.NOT_SET;
+     inputAudioFormat = AudioFormat.NOT_SET;
