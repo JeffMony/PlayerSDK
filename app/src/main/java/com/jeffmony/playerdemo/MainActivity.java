@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mCustomGlBtn = findViewById(R.id.cutome_gl_btn);
         //http://videocdn.mviplay.cn/video/283665.mp4
         //http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8
-        mUrlText.setText("http://videocdn.mviplay.cn/video/283665.mp4");
+        mUrlText.setText("http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8");
 
         mExoBtn.setOnClickListener(this);
         mIjkBtn.setOnClickListener(this);

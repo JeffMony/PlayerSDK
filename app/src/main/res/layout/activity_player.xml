@@ -51,14 +51,22 @@
         android:layout_height="wrap_content" >
         <Spinner
             android:id="@+id/speed_spinner"
-            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <Spinner
-            android:layout_marginLeft="20dp"
-            android:id="@+id/resolution_spinner"
-            android:layout_width="wrap_content"
+            android:id="@+id/volume_spinner"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <Spinner
+            android:id="@+id/resolution_spinner"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 </LinearLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="volume_array">
+        <item>音  量</item>
+        <item>0.5 X</item>
+        <item>1.0 X</item>
+        <item>2.0 X</item>
+        <item>3.0 X</item>
+        <item>4.0 X</item>
+    </string-array>
+</resources>

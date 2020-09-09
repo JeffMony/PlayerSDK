@@ -51,6 +51,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private ImageButton mVideoStateBtn;
     private Spinner mSpeedSpinner;
     private Spinner mResolutionSpinner;
+    private Spinner mVolumeSpinner;
 
     private String mUrl;
     private int mScreenWidth;
@@ -61,6 +62,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private Surface mSurface;
     private CommonPlayer mPlayer;
     private float mSpeed = 1.0f;
+    private float mVolume = 1.0f;
     private List<M3U8Seg> mSegList;
     private int mResolutionPosition = -1;
 
@@ -88,16 +90,51 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mResolutionSpinner = findViewById(R.id.resolution_spinner);
         mResolutionSpinner.setVisibility(View.GONE);
 
+        mVolumeSpinner = findViewById(R.id.volume_spinner);
+        ArrayAdapter<CharSequence> volumeAdapter = ArrayAdapter.createFromResource(this, R.array.volume_array, android.R.layout.simple_spinner_item);
+        volumeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mVolumeSpinner.setAdapter(volumeAdapter);
+        mVolumeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String volumeString = parent.getItemAtPosition(position).toString();
+                changeVolume(volumeString);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         mSpeedSpinner = findViewById(R.id.speed_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+        ArrayAdapter<CharSequence> speedAdapter = ArrayAdapter.createFromResource(this,
                 R.array.speed_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpeedSpinner.setAdapter(adapter);
+        speedAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpeedSpinner.setAdapter(speedAdapter);
         mSpeedSpinner.setOnItemSelectedListener(this);
+
 
         mVideoView.setSurfaceTextureListener(mSurfaceTextureListener);
         mProgressView.setOnSeekBarChangeListener(mSeekBarChangeListener);
         mVideoStateBtn.setOnClickListener(this);
+    }
+
+    private void changeVolume(String volumeString) {
+        if ("0.5 X".equals(volumeString)) {
+            mVolume = 0.5f;
+        } else if ("1.0 X".equals(volumeString)) {
+            mVolume = 1.0f;
+        } else if ("2.0 X".equals(volumeString)) {
+            mVolume = 2.0f;
+        } else if ("3.0 X".equals(volumeString)) {
+            mVolume = 3.0f;
+        } else if ("4.0 X".equals(volumeString)) {
+            mVolume = 4.0f;
+        } else {
+            mVolume = 1.0f;
+        }
+        mPlayer.setSonicVolume(mVolume);
     }
 
     private void initVideoResolutions(List<M3U8Seg> urlList) {
@@ -210,7 +247,6 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
             Log.w(TAG, "setDataSource failed, exception = " + e.getMessage());
             return;
         }
-        mPlayer.setSonicVolume(3f);
         mPlayer.setLooping(mIsLooping);
         mPlayer.setSurface(mSurface);
         mPlayer.setOnPreparedListener(mPrepareListener);

@@ -21,6 +21,7 @@ import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -38,7 +39,7 @@ import java.util.UUID;
 public class CustomGLViewActivity extends Activity {
 
     private static final String DEFAULT_MEDIA_URI =
-            "http://videocdn.mviplay.cn/video/283665.mp4";
+            "http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8";
 
     private static final String ACTION_VIEW = "com.google.android.exoplayer.gldemo.action.VIEW";
     private static final String EXTENSION_EXTRA = "extension";
@@ -144,7 +145,9 @@ public class CustomGLViewActivity extends Activity {
                         this, Util.getUserAgent(this, getString(R.string.app_name)));
         MediaSource mediaSource;
         @C.ContentType int type = Util.inferContentType(uri, intent.getStringExtra(EXTENSION_EXTRA));
-        if (type == C.TYPE_DASH) {
+        if (type == C.TYPE_HLS) {
+            mediaSource = new HlsMediaSource.Factory(dataSourceFactory).setDrmSessionManager(drmSessionManager).createMediaSource(uri);
+        } else if (type == C.TYPE_DASH) {
             mediaSource =
                     new DashMediaSource.Factory(dataSourceFactory)
                             .setDrmSessionManager(drmSessionManager)
