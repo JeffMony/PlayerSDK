@@ -100,7 +100,6 @@ public final class TsExtractor implements Extractor {
 
   private static final int TS_PAT_PID = 0;
   private static final int MAX_PID_PLUS_ONE = 0x2000;
-
   private static final long AC3_FORMAT_IDENTIFIER = 0x41432d33;
   private static final long E_AC3_FORMAT_IDENTIFIER = 0x45414333;
   private static final long AC4_FORMAT_IDENTIFIER = 0x41432d34;
@@ -406,10 +405,10 @@ public final class TsExtractor implements Extractor {
     tsPacketBuffer.setPosition(syncBytePosition);
     int endOfPacket = syncBytePosition + TS_PACKET_SIZE;
     if (endOfPacket > limit) {
-      bytesSinceLastSync += syncBytePosition - searchStart;
-      if (mode == MODE_HLS && bytesSinceLastSync > TS_PACKET_SIZE * 2) {
-        throw new ParserException("Cannot find sync byte. Most likely not a Transport Stream.");
-      }
+//      bytesSinceLastSync += syncBytePosition - searchStart;
+//      if (mode == MODE_HLS && bytesSinceLastSync > TS_PACKET_SIZE * 2) {
+//        throw new ParserException("Cannot find sync byte. Most likely not a Transport Stream.");
+//      }
     } else {
       // We have found a packet within the buffer.
       bytesSinceLastSync = 0;
