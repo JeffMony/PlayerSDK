@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    compileSdk 30
 
     defaultConfig {
         applicationId "com.jeffmony.playerdemo"
-        minSdkVersion 19
-        targetSdkVersion 29
+        minSdk 21
+        targetSdk 29
         versionCode 1
         versionName "1.0"
 
@@ -28,11 +27,12 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.github.JeffMony:ORCodeDemo:v1.5.0'
     implementation 'pub.devrel:easypermissions:2.0.1'
+    implementation 'com.github.JeffMony:Laker:1.0.0'
     implementation project(path: ':playersdk')
     implementation project(path: ':exoplayer')
 }

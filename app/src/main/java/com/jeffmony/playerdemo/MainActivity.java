@@ -141,8 +141,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == mGLPlayerBtn) {
             playWithGLView();
         } else if (v == mCustomGlBtn) {
-            Intent intent = new Intent(MainActivity.this, CustomGLViewActivity.class);
-            startActivity(intent);
+//            Intent intent = new Intent(MainActivity.this, CustomGLViewActivity.class);
+//            startActivity(intent);
         }
     }
 
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void playWithGLView() {
-        Intent intent = new Intent(this, MyGLPlayerActivity.class);
-        startActivity(intent);
+//        Intent intent = new Intent(this, MyGLPlayerActivity.class);
+//        startActivity(intent);
     }
 }

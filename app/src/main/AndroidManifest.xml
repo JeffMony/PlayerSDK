@@ -35,8 +35,6 @@
         <activity android:name="com.jeffmony.orcode.CaptureActivity"
             android:theme="@style/CaptureTheme" />
         <activity android:name=".PlayerActivity" />
-        <activity android:name=".MyGLPlayerActivity" />
-        <activity android:name=".CustomGLViewActivity" />
     </application>
 
 </manifest>
