@@ -8,8 +8,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jeffmony.playersdk.CommonPlayer;
@@ -37,9 +41,13 @@ public class SurfaceViewActivity extends AppCompatActivity {
     private Surface mSurface;
     private CommonPlayer mPlayer;
     private Button mPlayPauseBtn;
+    private LinearLayout mBottomLayout;
+    private SeekBar mAdjustSeekBar;
+    private TextView mAdjustTextView;
     private String mVideoUrl;
     private int mBackgroundEffectId = -1;
     private int mStickerId = -1;
+    private int mHighResolutionId = -1;
 
     private Handler mMainHandler = new Handler(msg -> {
         int what = msg.what;
@@ -53,12 +61,33 @@ public class SurfaceViewActivity extends AppCompatActivity {
         return false;
     });
 
+    private SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_surface_view);
         mVideoUrl = getIntent().getStringExtra("video_uri");
         mVideoSurfaceView = findViewById(R.id.video_surface_view);
+        mBottomLayout = findViewById(R.id.bottom_layout);
+        mAdjustSeekBar = findViewById(R.id.adjust_seek_bar);
+        mAdjustTextView = findViewById(R.id.adjust_text_view);
+        mAdjustSeekBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
         mRenderProcess = RenderSdk.createRenderProcess();
         mRenderProcess.setSurfaceView(mVideoSurfaceView);
         mRenderProcess.setOnSurfaceListener(new OnSurfaceListener() {
@@ -99,10 +128,15 @@ public class SurfaceViewActivity extends AppCompatActivity {
                 mRenderProcess.deleteEffect(mStickerId);
                 mStickerId = -1;
             }
+            if (mHighResolutionId != -1) {
+                mRenderProcess.deleteEffect(mHighResolutionId);
+                mHighResolutionId = -1;
+            }
             mRenderProcess.setMirror(MirrorType.NONE);
             if (!mPlayer.isPlaying()) {
                 mRenderProcess.updateFrame();
             }
+            mBottomLayout.setVisibility(View.INVISIBLE);
         });
         mPlayPauseBtn = findViewById(R.id.play_pause_btn);
         mPlayPauseBtn.setOnClickListener(v-> {
@@ -183,7 +217,74 @@ public class SurfaceViewActivity extends AppCompatActivity {
                 mRenderProcess.updateFrame();
             }
         });
-
+        findViewById(R.id.high_btn).setOnClickListener(v -> {
+            if (mRenderProcess == null) {
+                return;
+            }
+            mBottomLayout.setVisibility(View.INVISIBLE);
+            if (mHighResolutionId == -1) {
+                mHighResolutionId = mRenderProcess.addEffect("{\n" +
+                        "    \"effect\":[\n" +
+                        "        {\n" +
+                        "            \"type\":\"color_adjust\",\n" +
+                        "            \"method_bit\":45,\n" +
+                        "            \"brightness_level\":10,\n" +
+                        "            \"temperature_level\":5,\n" +
+                        "            \"saturation_level\":20,\n" +
+                        "            \"sharpness_level\":10\n" +
+                        "        }\n" +
+                        "    ]\n" +
+                        "}");
+            } else {
+                mRenderProcess.deleteEffect(mHighResolutionId);
+                mHighResolutionId = -1;
+            }
+            if (!mPlayer.isPlaying()) {
+                mRenderProcess.updateFrame();
+            }
+        });
+        findViewById(R.id.bright_btn).setOnClickListener(v -> {
+            if (mRenderProcess == null) {
+                return;
+            }
+            mBottomLayout.setVisibility(View.VISIBLE);
+            mAdjustTextView.setText("调整亮度");
+        });
+        findViewById(R.id.contrast_btn).setOnClickListener(v -> {
+            if (mRenderProcess == null) {
+                return;
+            }
+            mBottomLayout.setVisibility(View.VISIBLE);
+            mAdjustTextView.setText("调整对比度");
+        });
+        findViewById(R.id.temperature_btn).setOnClickListener(v -> {
+            if (mRenderProcess == null) {
+                return;
+            }
+            mBottomLayout.setVisibility(View.VISIBLE);
+            mAdjustTextView.setText("调整色温");
+        });
+        findViewById(R.id.saturation_btn).setOnClickListener(v -> {
+            if (mRenderProcess == null) {
+                return;
+            }
+            mBottomLayout.setVisibility(View.VISIBLE);
+            mAdjustTextView.setText("调整饱和度");
+        });
+        findViewById(R.id.sharp_btn).setOnClickListener(v -> {
+            if (mRenderProcess == null) {
+                return;
+            }
+            mBottomLayout.setVisibility(View.VISIBLE);
+            mAdjustTextView.setText("调整锐度");
+        });
+        findViewById(R.id.grain_btn).setOnClickListener(v -> {
+            if (mRenderProcess == null) {
+                return;
+            }
+            mBottomLayout.setVisibility(View.VISIBLE);
+            mAdjustTextView.setText("调整颗粒度");
+        });
     }
 
     @Override

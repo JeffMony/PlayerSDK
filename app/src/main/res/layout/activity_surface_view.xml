@@ -10,6 +10,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
         
+        <LinearLayout
+            android:id="@+id/bottom_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="invisible"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="40dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
+            <TextView
+                android:id="@+id/adjust_text_view"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="调整亮度"
+                android:textSize="20sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <SeekBar
+                android:id="@+id/adjust_seek_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
         <com.jeffmony.videorender.view.VideoSurfaceView
             android:id="@+id/video_surface_view"
             android:layout_centerInParent="true"
