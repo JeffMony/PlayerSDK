@@ -13,6 +13,18 @@
 > * 播放时调整声音大小
 > * 播放视频加水印
 
+#### 播放器渲染SDK
+- 可以支持MediaPlayer、ijkplayer、exoplayer接入外部的渲染工具，使用opengl渲染
+- 可以支持SurfaceView和TextureView
+- 可以添加贴纸
+- 可以调整清晰度
+- 可以调整亮度、对比度、色温、饱和度、颗粒度、锐度
+- 可以截图
+- 可以调整黑白滤镜
+- 可以添加滤镜
+
+![](./files/video-render.jpeg)
+
 #### 版本更新日志
 ##### 2.0.0
 ```
