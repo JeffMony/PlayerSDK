@@ -21,6 +21,7 @@ import com.jeffmony.playersdk.IPlayer;
 import com.jeffmony.playersdk.PlayerParams;
 import com.jeffmony.playersdk.PlayerType;
 import com.jeffmony.playersdk.utils.ScreenUtils;
+import com.jeffmony.videorender.ColorAdjustUtils;
 import com.jeffmony.videorender.IRenderProcess;
 import com.jeffmony.videorender.ImageUtils;
 import com.jeffmony.videorender.LogTag;
@@ -48,6 +49,30 @@ public class SurfaceViewActivity extends AppCompatActivity {
     private int mBackgroundEffectId = -1;
     private int mStickerId = -1;
     private int mHighResolutionId = -1;
+    /**
+     * 调节范围：-100 ~ 100
+     */
+    private int mBrightId = -1;
+    /**
+     * 调节范围：-100 ~ 100
+     */
+    private int mContrastId = -1;
+    /**
+     * 调节范围：-100 ~ 100
+     */
+    private int mTemperatureId = -1;
+    /**
+     * 调节范围：-100 ~ 100
+     */
+    private int mSaturationId = -1;
+    /**
+     * 调节范围：0 ~ 100
+     */
+    private int mGrainId = -1;
+    /**
+     * 调节范围：0 ~ 100
+     */
+    private int mSharpId = -1;
 
     private Handler mMainHandler = new Handler(msg -> {
         int what = msg.what;
@@ -64,7 +89,31 @@ public class SurfaceViewActivity extends AppCompatActivity {
     private SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
+            if (mBrightId != -1) {
+                int level = (progress - 50) * 2;
+                String brightStr = ColorAdjustUtils.getBrightEffect(level);
+                mRenderProcess.updateEffect(mBrightId, brightStr);
+            } else if (mContrastId != -1) {
+                int level = (progress - 50) * 2;
+                String contrastStr = ColorAdjustUtils.getContrastEffect(level);
+                mRenderProcess.updateEffect(mContrastId, contrastStr);
+            } else if (mTemperatureId != -1) {
+                int level = (progress - 50) * 2;
+                String temperatureStr = ColorAdjustUtils.getTemperatureEffect(level);
+                mRenderProcess.updateEffect(mTemperatureId, temperatureStr);
+            } else if (mSaturationId != -1) {
+                int level = (progress - 50) * 2;
+                String saturationStr = ColorAdjustUtils.getSaturationEffect(level);
+                mRenderProcess.updateEffect(mSaturationId, saturationStr);
+            } else if (mGrainId != -1) {
+                int level = progress;
+                String grainStr = ColorAdjustUtils.getGrainEffect(level);
+                mRenderProcess.updateEffect(mGrainId, grainStr);
+            } else if (mSharpId != -1) {
+                int level = progress;
+                String sharpStr = ColorAdjustUtils.getSharpEffect(level);
+                mRenderProcess.updateEffect(mSharpId, sharpStr);
+            }
         }
 
         @Override
@@ -86,6 +135,7 @@ public class SurfaceViewActivity extends AppCompatActivity {
         mVideoSurfaceView = findViewById(R.id.video_surface_view);
         mBottomLayout = findViewById(R.id.bottom_layout);
         mAdjustSeekBar = findViewById(R.id.adjust_seek_bar);
+        mAdjustSeekBar.setMax(100);
         mAdjustTextView = findViewById(R.id.adjust_text_view);
         mAdjustSeekBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
         mRenderProcess = RenderSdk.createRenderProcess();
@@ -132,6 +182,10 @@ public class SurfaceViewActivity extends AppCompatActivity {
                 mRenderProcess.deleteEffect(mHighResolutionId);
                 mHighResolutionId = -1;
             }
+            if (mBrightId != -1) {
+                mRenderProcess.deleteEffect(mBrightId);
+                mBrightId = -1;
+            }
             mRenderProcess.setMirror(MirrorType.NONE);
             if (!mPlayer.isPlaying()) {
                 mRenderProcess.updateFrame();
@@ -153,7 +207,11 @@ public class SurfaceViewActivity extends AppCompatActivity {
             if (mRenderProcess == null) {
                 return;
             }
-            mRenderProcess.setMirror(MirrorType.HORIZONTAL);
+            if (mRenderProcess.getMirrorType() != MirrorType.NONE) {
+                mRenderProcess.setMirror(MirrorType.NONE);
+            } else {
+                mRenderProcess.setMirror(MirrorType.HORIZONTAL);
+            }
             if (!mPlayer.isPlaying()) {
                 mRenderProcess.updateFrame();
             }
@@ -162,7 +220,11 @@ public class SurfaceViewActivity extends AppCompatActivity {
             if (mRenderProcess == null) {
                 return;
             }
-            mRenderProcess.setMirror(MirrorType.VERTICAL);
+            if (mRenderProcess.getMirrorType() != MirrorType.NONE) {
+                mRenderProcess.setMirror(MirrorType.NONE);
+            } else {
+                mRenderProcess.setMirror(MirrorType.VERTICAL);
+            }
             if (!mPlayer.isPlaying()) {
                 mRenderProcess.updateFrame();
             }
@@ -221,18 +283,8 @@ public class SurfaceViewActivity extends AppCompatActivity {
             }
             mBottomLayout.setVisibility(View.INVISIBLE);
             if (mHighResolutionId == -1) {
-                mHighResolutionId = mRenderProcess.addEffect("{\n" +
-                        "    \"effect\":[\n" +
-                        "        {\n" +
-                        "            \"type\":\"color_adjust\",\n" +
-                        "            \"method_bit\":45,\n" +
-                        "            \"brightness_level\":10,\n" +
-                        "            \"temperature_level\":5,\n" +
-                        "            \"saturation_level\":20,\n" +
-                        "            \"sharpness_level\":10\n" +
-                        "        }\n" +
-                        "    ]\n" +
-                        "}");
+                String highStr = ColorAdjustUtils.getColorEffect(10, 0, 5, 20, 0, 10);
+                mHighResolutionId = mRenderProcess.addEffect(highStr);
             } else {
                 mRenderProcess.deleteEffect(mHighResolutionId);
                 mHighResolutionId = -1;
@@ -247,6 +299,17 @@ public class SurfaceViewActivity extends AppCompatActivity {
             }
             mBottomLayout.setVisibility(View.VISIBLE);
             mAdjustTextView.setText("调整亮度");
+            if (mBrightId == -1) {
+                String brightStr = ColorAdjustUtils.getBrightEffect(0);
+                mBrightId = mRenderProcess.addEffect(brightStr);
+                mAdjustSeekBar.setProgress(50);
+            } else {
+                mRenderProcess.deleteEffect(mBrightId);
+                mBrightId = -1;
+            }
+            if (!mPlayer.isPlaying()) {
+                mRenderProcess.updateFrame();
+            }
         });
         findViewById(R.id.contrast_btn).setOnClickListener(v -> {
             if (mRenderProcess == null) {
@@ -254,6 +317,17 @@ public class SurfaceViewActivity extends AppCompatActivity {
             }
             mBottomLayout.setVisibility(View.VISIBLE);
             mAdjustTextView.setText("调整对比度");
+            if (mContrastId == -1) {
+                String contrastStr = ColorAdjustUtils.getContrastEffect(0);
+                mRenderProcess.addEffect(contrastStr);
+                mAdjustSeekBar.setProgress(50);
+            } else {
+                mRenderProcess.deleteEffect(mContrastId);
+                mContrastId = -1;
+            }
+            if (!mPlayer.isPlaying()) {
+                mRenderProcess.updateFrame();
+            }
         });
         findViewById(R.id.temperature_btn).setOnClickListener(v -> {
             if (mRenderProcess == null) {
@@ -261,6 +335,17 @@ public class SurfaceViewActivity extends AppCompatActivity {
             }
             mBottomLayout.setVisibility(View.VISIBLE);
             mAdjustTextView.setText("调整色温");
+            if (mTemperatureId == -1) {
+                String temperatureStr = ColorAdjustUtils.getTemperatureEffect(0);
+                mTemperatureId = mRenderProcess.addEffect(temperatureStr);
+                mAdjustSeekBar.setProgress(50);
+            } else {
+                mRenderProcess.deleteEffect(mTemperatureId);
+                mTemperatureId = -1;
+            }
+            if (!mPlayer.isPlaying()) {
+                mRenderProcess.updateFrame();
+            }
         });
         findViewById(R.id.saturation_btn).setOnClickListener(v -> {
             if (mRenderProcess == null) {
@@ -268,6 +353,17 @@ public class SurfaceViewActivity extends AppCompatActivity {
             }
             mBottomLayout.setVisibility(View.VISIBLE);
             mAdjustTextView.setText("调整饱和度");
+            if (mSaturationId == -1) {
+                String saturationStr = ColorAdjustUtils.getSaturationEffect(0);
+                mSaturationId = mRenderProcess.addEffect(saturationStr);
+                mAdjustSeekBar.setProgress(50);
+            } else {
+                mRenderProcess.deleteEffect(mSaturationId);
+                mSaturationId = -1;
+            }
+            if (!mPlayer.isPlaying()) {
+                mRenderProcess.updateFrame();
+            }
         });
         findViewById(R.id.sharp_btn).setOnClickListener(v -> {
             if (mRenderProcess == null) {
@@ -275,6 +371,17 @@ public class SurfaceViewActivity extends AppCompatActivity {
             }
             mBottomLayout.setVisibility(View.VISIBLE);
             mAdjustTextView.setText("调整锐度");
+            if (mSharpId == -1) {
+                String sharpStr = ColorAdjustUtils.getSharpEffect(0);
+                mSharpId = mRenderProcess.addEffect(sharpStr);
+                mAdjustSeekBar.setProgress(0);
+            } else {
+                mRenderProcess.deleteEffect(mSharpId);
+                mSharpId = -1;
+            }
+            if (!mPlayer.isPlaying()) {
+                mRenderProcess.updateFrame();
+            }
         });
         findViewById(R.id.grain_btn).setOnClickListener(v -> {
             if (mRenderProcess == null) {
@@ -282,6 +389,17 @@ public class SurfaceViewActivity extends AppCompatActivity {
             }
             mBottomLayout.setVisibility(View.VISIBLE);
             mAdjustTextView.setText("调整颗粒度");
+            if (mGrainId == -1) {
+                String grainStr = ColorAdjustUtils.getGrainEffect(0);
+                mGrainId = mRenderProcess.addEffect(grainStr);
+                mAdjustSeekBar.setProgress(0);
+            } else {
+                mRenderProcess.deleteEffect(mGrainId);
+                mGrainId = -1;
+            }
+            if (!mPlayer.isPlaying()) {
+                mRenderProcess.updateFrame();
+            }
         });
     }
 
