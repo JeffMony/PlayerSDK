@@ -175,21 +175,19 @@ public class SurfaceViewActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(Bitmap bitmap) {
                     Log.i(LogTag.TAG, "captureFrame onSuccess");
-                    if (bitmap != null) {
-                        ImageUtils.saveImg(bitmap, "/sdcard/DCIM/Camera/result.jpg");
-                        bitmap.recycle();
-                        mMainHandler.post(() -> {
-                            Toast.makeText(SurfaceViewActivity.this, "截图成功", Toast.LENGTH_SHORT).show();
-                        });
-                    }
+                    Toast.makeText(SurfaceViewActivity.this, "截图成功", Toast.LENGTH_SHORT).show();
+                    new Thread(() -> {
+                        if (bitmap != null) {
+                            ImageUtils.saveImg(bitmap, "/sdcard/DCIM/Camera/result.jpg");
+                            bitmap.recycle();
+                        }
+                    }).start();
                 }
 
                 @Override
                 public void onError(int code) {
                     Log.e(LogTag.TAG, "captureFrame onError");
-                    mMainHandler.post(() -> {
-                        Toast.makeText(SurfaceViewActivity.this, "截图失败", Toast.LENGTH_SHORT).show();
-                    });
+                    Toast.makeText(SurfaceViewActivity.this, "截图失败", Toast.LENGTH_SHORT).show();
                 }
             });
         });
