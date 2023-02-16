@@ -22,12 +22,13 @@ import com.jeffmony.playersdk.IPlayer;
 import com.jeffmony.playersdk.PlayerParams;
 import com.jeffmony.playersdk.PlayerType;
 import com.jeffmony.playersdk.utils.ScreenUtils;
-import com.jeffmony.videorender.ColorAdjustUtils;
+import com.jeffmony.videorender.effect.ColorAdjustUtils;
 import com.jeffmony.videorender.IRenderProcess;
 import com.jeffmony.videorender.ImageUtils;
 import com.jeffmony.videorender.LogTag;
 import com.jeffmony.videorender.MirrorType;
 import com.jeffmony.videorender.RenderSdk;
+import com.jeffmony.videorender.effect.StickerUtils;
 import com.jeffmony.videorender.listener.OnCaptureListener;
 import com.jeffmony.videorender.listener.OnSurfaceListener;
 
@@ -257,17 +258,8 @@ public class TextureViewActivity extends AppCompatActivity {
                 return;
             }
             if (mStickerId == -1) {
-                mStickerId = mRenderProcess.addEffect("{\n" +
-                        "    \"effect\":[\n" +
-                        "        {\n" +
-                        "            \"type\":\"sticker\",\n" +
-                        "            \"path\":\"/sdcard/Pictures/icon.png\",\n" +
-                        "            \"center_x\":0.1,\n" +
-                        "            \"center_y\":0.2,\n" +
-                        "            \"scale\":1.0\n" +
-                        "        }\n" +
-                        "    ]\n" +
-                        "}");
+                String stickerStr = StickerUtils.createStickerStr("/sdcard/Pictures/icon.png", 0.1f, 0.2f, 1.0f, 0.0f);
+                mStickerId = mRenderProcess.addEffect(stickerStr);
             } else {
                 mRenderProcess.deleteEffect(mStickerId);
                 mStickerId = -1;
