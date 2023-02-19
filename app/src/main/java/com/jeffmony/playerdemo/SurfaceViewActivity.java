@@ -21,12 +21,14 @@ import com.jeffmony.playersdk.IPlayer;
 import com.jeffmony.playersdk.PlayerParams;
 import com.jeffmony.playersdk.PlayerType;
 import com.jeffmony.playersdk.utils.ScreenUtils;
+import com.jeffmony.videorender.effect.BlackWhiteUtils;
 import com.jeffmony.videorender.effect.ColorAdjustUtils;
 import com.jeffmony.videorender.IRenderProcess;
 import com.jeffmony.videorender.ImageUtils;
 import com.jeffmony.videorender.LogTag;
 import com.jeffmony.videorender.MirrorType;
 import com.jeffmony.videorender.RenderSdk;
+import com.jeffmony.videorender.effect.GridUtils;
 import com.jeffmony.videorender.effect.StickerUtils;
 import com.jeffmony.videorender.listener.OnCaptureListener;
 import com.jeffmony.videorender.listener.OnSurfaceListener;
@@ -74,6 +76,16 @@ public class SurfaceViewActivity extends AppCompatActivity {
      * 调节范围：0 ~ 100
      */
     private int mSharpId = -1;
+
+    /**
+     * 四分镜特效id
+     */
+    private int mGridId = -1;
+
+    /**
+     * 黑白滤镜id
+     */
+    private int mBlackWhiteId = -1;
 
     private Handler mMainHandler = new Handler(msg -> {
         int what = msg.what;
@@ -188,6 +200,14 @@ public class SurfaceViewActivity extends AppCompatActivity {
                 mBrightId = -1;
             }
             mRenderProcess.setMirror(MirrorType.NONE);
+            if (mGridId != -1) {
+                mRenderProcess.deleteEffect(mGridId);
+                mGridId = -1;
+            }
+            if (mBlackWhiteId != -1) {
+                mRenderProcess.deleteEffect(mBlackWhiteId);
+                mBlackWhiteId = -1;
+            }
             if (!mPlayer.isPlaying()) {
                 mRenderProcess.updateFrame();
             }
@@ -388,6 +408,36 @@ public class SurfaceViewActivity extends AppCompatActivity {
             } else {
                 mRenderProcess.deleteEffect(mGrainId);
                 mGrainId = -1;
+            }
+            if (!mPlayer.isPlaying()) {
+                mRenderProcess.updateFrame();
+            }
+        });
+        findViewById(R.id.grid_btn).setOnClickListener(v -> {
+            if (mRenderProcess == null) {
+                return;
+            }
+            mBottomLayout.setVisibility(View.INVISIBLE);
+            if (mGridId == -1) {
+                mGridId = mRenderProcess.addEffect(GridUtils.getGridStr());
+            } else {
+                mRenderProcess.deleteEffect(mGridId);
+                mGridId = -1;
+            }
+            if (!mPlayer.isPlaying()) {
+                mRenderProcess.updateFrame();
+            }
+        });
+        findViewById(R.id.wb_btn).setOnClickListener(v -> {
+            if (mRenderProcess == null) {
+                return;
+            }
+            mBottomLayout.setVisibility(View.INVISIBLE);
+            if (mBlackWhiteId == -1) {
+                mBlackWhiteId = mRenderProcess.addEffect(BlackWhiteUtils.getBlackWhiteStr());
+            } else {
+                mRenderProcess.deleteEffect(mBlackWhiteId);
+                mBlackWhiteId = -1;
             }
             if (!mPlayer.isPlaying()) {
                 mRenderProcess.updateFrame();

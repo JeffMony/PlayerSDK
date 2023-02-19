@@ -173,8 +173,8 @@
                 android:layout_height="wrap_content" />
 
             <Button
-                android:id="@+id/size_changed_btn"
-                android:text="调整大小"
+                android:id="@+id/grid_btn"
+                android:text="四分镜"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
