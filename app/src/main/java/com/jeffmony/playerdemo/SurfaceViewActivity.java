@@ -1,7 +1,5 @@
 package com.jeffmony.playerdemo;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,18 +14,20 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.jeffmony.playersdk.CommonPlayer;
 import com.jeffmony.playersdk.IPlayer;
 import com.jeffmony.playersdk.PlayerParams;
 import com.jeffmony.playersdk.PlayerType;
 import com.jeffmony.playersdk.utils.ScreenUtils;
-import com.jeffmony.videorender.effect.BlackWhiteUtils;
-import com.jeffmony.videorender.effect.ColorAdjustUtils;
 import com.jeffmony.videorender.IRenderProcess;
 import com.jeffmony.videorender.ImageUtils;
 import com.jeffmony.videorender.LogTag;
 import com.jeffmony.videorender.MirrorType;
 import com.jeffmony.videorender.RenderSdk;
+import com.jeffmony.videorender.effect.BlackWhiteUtils;
+import com.jeffmony.videorender.effect.ColorAdjustUtils;
 import com.jeffmony.videorender.effect.GridUtils;
 import com.jeffmony.videorender.effect.StickerUtils;
 import com.jeffmony.videorender.listener.OnCaptureListener;
