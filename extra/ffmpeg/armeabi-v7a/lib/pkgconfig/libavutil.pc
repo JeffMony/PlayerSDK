@@ -1,0 +1,14 @@
+prefix=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-armv7a/output
+exec_prefix=${prefix}
+libdir=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-armv7a/output/lib
+includedir=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-armv7a/output/include
+
+Name: libavutil
+Description: FFmpeg utility library
+Version: 56.14.100
+Requires: 
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavutil -pthread -lm
+Libs.private: 
+Cflags: -I${includedir}

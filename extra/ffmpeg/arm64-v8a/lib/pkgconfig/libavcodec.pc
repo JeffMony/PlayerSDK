@@ -1,0 +1,14 @@
+prefix=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-arm64/output
+exec_prefix=${prefix}
+libdir=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-arm64/output/lib
+includedir=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-arm64/output/include
+
+Name: libavcodec
+Description: FFmpeg codec library
+Version: 58.18.100
+Requires: libavutil >= 56.14.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavcodec -pthread -lm -lz
+Libs.private: 
+Cflags: -I${includedir}

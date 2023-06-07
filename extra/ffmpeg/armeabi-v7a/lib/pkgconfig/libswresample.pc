@@ -1,0 +1,14 @@
+prefix=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-armv7a/output
+exec_prefix=${prefix}
+libdir=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-armv7a/output/lib
+includedir=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-armv7a/output/include
+
+Name: libswresample
+Description: FFmpeg audio resampling library
+Version: 3.1.100
+Requires: libavutil >= 56.14.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lswresample -lm
+Libs.private: 
+Cflags: -I${includedir}

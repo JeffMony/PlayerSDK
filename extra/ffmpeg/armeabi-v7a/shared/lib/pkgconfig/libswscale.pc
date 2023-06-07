@@ -1,0 +1,14 @@
+prefix=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-armv7a/output/shared
+exec_prefix=${prefix}
+libdir=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-armv7a/output/shared/lib
+includedir=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-armv7a/output/shared/include
+
+Name: libswscale
+Description: FFmpeg image rescaling library
+Version: 5.1.100
+Requires: libavutil >= 56.14.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lijkffmpeg -lm
+Libs.private: 
+Cflags: -I${includedir}
