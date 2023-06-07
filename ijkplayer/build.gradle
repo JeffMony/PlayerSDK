@@ -9,6 +9,13 @@ android {
         versionCode 1
         versionName "1.0"
 
+        externalNativeBuild {
+            cmake {
+                cFlags "-fvisibility=hidden -fvisibility-inlines-hidden", "-ffunction-sections -fdata-sections"
+                abiFilters "armeabi-v7a", "arm64-v8a"
+            }
+        }
+        
         consumerProguardFiles 'consumer-rules.pro'
     }
 
@@ -16,6 +23,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            version "3.10.2"
+            path "CMakeLists.txt"
         }
     }
 

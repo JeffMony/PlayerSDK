@@ -1,0 +1,14 @@
+prefix=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-arm64/output/shared
+exec_prefix=${prefix}
+libdir=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-arm64/output/shared/lib
+includedir=/Users/jefflee/source/ijkplayer/android/contrib/build/ffmpeg-arm64/output/shared/include
+
+Name: libavfilter
+Description: FFmpeg audio/video filtering library
+Version: 7.16.100
+Requires: libavutil >= 56.14.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lijkffmpeg -pthread -lm
+Libs.private: 
+Cflags: -I${includedir}
