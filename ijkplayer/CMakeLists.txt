@@ -4,7 +4,7 @@ enable_language(ASM)
 set(-DCMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wall -s -Wdeprecated-declarations")
 set(-DCMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -s -Wdeprecated-declarations")
 
-set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../extra)
+set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../third_party)
 
 add_definitions("
 -DLIBYUV_NEON
