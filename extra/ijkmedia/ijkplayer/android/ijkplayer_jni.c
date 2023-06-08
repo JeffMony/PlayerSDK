@@ -32,6 +32,7 @@
 #include "j4a/class/tv/danmaku/ijk/media/player/misc/IMediaDataSource.h"
 #include "j4a/class/tv/danmaku/ijk/media/player/misc/IAndroidIO.h"
 #include "ijksdl/ijksdl_log.h"
+#include "ijkplayer_jni.h"
 #include "../ff_ffplay.h"
 #include "ffmpeg_api_jni.h"
 #include "ijkplayer_android_def.h"
@@ -381,7 +382,6 @@ IjkMediaPlayer_release(JNIEnv *env, jobject thiz)
     ijkmp_dec_ref_p(&mp);
 }
 
-static void IjkMediaPlayer_native_setup(JNIEnv *env, jobject thiz, jobject weak_this);
 static void
 IjkMediaPlayer_reset(JNIEnv *env, jobject thiz)
 {
@@ -1127,88 +1127,53 @@ LABEL_RETURN:
     return;
 }
 
+int IjkMediaPlayer_OnLoad(JNIEnv *env) {
+  pthread_mutex_init(&g_clazz.mutex, NULL );
 
+  // FindClass returns LocalReference
+  IJK_FIND_JAVA_CLASS(env, g_clazz.clazz, JNI_CLASS_IJKPLAYER);
+  (*env)->RegisterNatives(env, g_clazz.clazz, g_methods, NELEM(g_methods) );
 
+  ijkmp_global_init();
+  ijkmp_global_set_inject_callback(inject_callback);
 
+  FFmpegApi_global_init(env);
 
-// ----------------------------------------------------------------------------
-
-static JNINativeMethod g_methods[] = {
-    {
-        "_setDataSource",
-        "(Ljava/lang/String;[Ljava/lang/String;[Ljava/lang/String;)V",
-        (void *) IjkMediaPlayer_setDataSourceAndHeaders
-    },
-    { "_setDataSourceFd",       "(I)V",     (void *) IjkMediaPlayer_setDataSourceFd },
-    { "_setDataSource",         "(Ltv/danmaku/ijk/media/player/misc/IMediaDataSource;)V", (void *)IjkMediaPlayer_setDataSourceCallback },
-    { "_setAndroidIOCallback",  "(Ltv/danmaku/ijk/media/player/misc/IAndroidIO;)V", (void *)IjkMediaPlayer_setAndroidIOCallback },
-
-    { "_setVideoSurface",       "(Landroid/view/Surface;)V", (void *) IjkMediaPlayer_setVideoSurface },
-    { "_prepareAsync",          "()V",      (void *) IjkMediaPlayer_prepareAsync },
-    { "_start",                 "()V",      (void *) IjkMediaPlayer_start },
-    { "_stop",                  "()V",      (void *) IjkMediaPlayer_stop },
-    { "seekTo",                 "(J)V",     (void *) IjkMediaPlayer_seekTo },
-    { "_pause",                 "()V",      (void *) IjkMediaPlayer_pause },
-    { "isPlaying",              "()Z",      (void *) IjkMediaPlayer_isPlaying },
-    { "getCurrentPosition",     "()J",      (void *) IjkMediaPlayer_getCurrentPosition },
-    { "getDuration",            "()J",      (void *) IjkMediaPlayer_getDuration },
-    { "_release",               "()V",      (void *) IjkMediaPlayer_release },
-    { "_reset",                 "()V",      (void *) IjkMediaPlayer_reset },
-    { "setVolume",              "(FF)V",    (void *) IjkMediaPlayer_setVolume },
-    { "getAudioSessionId",      "()I",      (void *) IjkMediaPlayer_getAudioSessionId },
-    { "native_init",            "()V",      (void *) IjkMediaPlayer_native_init },
-    { "native_setup",           "(Ljava/lang/Object;)V", (void *) IjkMediaPlayer_native_setup },
-    { "native_finalize",        "()V",      (void *) IjkMediaPlayer_native_finalize },
-
-    { "_setOption",             "(ILjava/lang/String;Ljava/lang/String;)V", (void *) IjkMediaPlayer_setOption },
-    { "_setOption",             "(ILjava/lang/String;J)V",                  (void *) IjkMediaPlayer_setOptionLong },
-
-    { "_getColorFormatName",    "(I)Ljava/lang/String;",    (void *) IjkMediaPlayer_getColorFormatName },
-    { "_getVideoCodecInfo",     "()Ljava/lang/String;",     (void *) IjkMediaPlayer_getVideoCodecInfo },
-    { "_getAudioCodecInfo",     "()Ljava/lang/String;",     (void *) IjkMediaPlayer_getAudioCodecInfo },
-    { "_getMediaMeta",          "()Landroid/os/Bundle;",    (void *) IjkMediaPlayer_getMediaMeta },
-    { "_setLoopCount",          "(I)V",                     (void *) IjkMediaPlayer_setLoopCount },
-    { "_getLoopCount",          "()I",                      (void *) IjkMediaPlayer_getLoopCount },
-    { "_getPropertyFloat",      "(IF)F",                    (void *) ijkMediaPlayer_getPropertyFloat },
-    { "_setPropertyFloat",      "(IF)V",                    (void *) ijkMediaPlayer_setPropertyFloat },
-    { "_getPropertyLong",       "(IJ)J",                    (void *) ijkMediaPlayer_getPropertyLong },
-    { "_setPropertyLong",       "(IJ)V",                    (void *) ijkMediaPlayer_setPropertyLong },
-    { "_setStreamSelected",     "(IZ)V",                    (void *) ijkMediaPlayer_setStreamSelected },
-
-    { "native_profileBegin",    "(Ljava/lang/String;)V",    (void *) IjkMediaPlayer_native_profileBegin },
-    { "native_profileEnd",      "()V",                      (void *) IjkMediaPlayer_native_profileEnd },
-
-    { "native_setLogLevel",     "(I)V",                     (void *) IjkMediaPlayer_native_setLogLevel },
-    { "_setFrameAtTime",        "(Ljava/lang/String;JJII)V", (void *) IjkMediaPlayer_setFrameAtTime },
-};
-
-JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
-{
-    JNIEnv* env = NULL;
-
-    g_jvm = vm;
-    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK) {
-        return -1;
-    }
-    assert(env != NULL);
-
-    pthread_mutex_init(&g_clazz.mutex, NULL );
-
-    // FindClass returns LocalReference
-    IJK_FIND_JAVA_CLASS(env, g_clazz.clazz, JNI_CLASS_IJKPLAYER);
-    (*env)->RegisterNatives(env, g_clazz.clazz, g_methods, NELEM(g_methods) );
-
-    ijkmp_global_init();
-    ijkmp_global_set_inject_callback(inject_callback);
-
-    FFmpegApi_global_init(env);
-
-    return JNI_VERSION_1_4;
+  return JNI_VERSION_1_4;
 }
 
-JNIEXPORT void JNI_OnUnload(JavaVM *jvm, void *reserved)
-{
-    ijkmp_global_uninit();
-
-    pthread_mutex_destroy(&g_clazz.mutex);
+void IjkMediaPlayer_OnUnload() {
+  ijkmp_global_uninit();
+  pthread_mutex_destroy(&g_clazz.mutex);
 }
+
+//JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
+//{
+//    JNIEnv* env = NULL;
+//
+//    g_jvm = vm;
+//    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK) {
+//        return -1;
+//    }
+//    assert(env != NULL);
+//
+//    pthread_mutex_init(&g_clazz.mutex, NULL );
+//
+//    // FindClass returns LocalReference
+//    IJK_FIND_JAVA_CLASS(env, g_clazz.clazz, JNI_CLASS_IJKPLAYER);
+//    (*env)->RegisterNatives(env, g_clazz.clazz, g_methods, NELEM(g_methods) );
+//
+//    ijkmp_global_init();
+//    ijkmp_global_set_inject_callback(inject_callback);
+//
+//    FFmpegApi_global_init(env);
+//
+//    return JNI_VERSION_1_4;
+//}
+//
+//JNIEXPORT void JNI_OnUnload(JavaVM *jvm, void *reserved)
+//{
+//    ijkmp_global_uninit();
+//
+//    pthread_mutex_destroy(&g_clazz.mutex);
+//}
