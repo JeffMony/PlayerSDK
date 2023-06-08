@@ -23,7 +23,6 @@
  */
 
 #include "ijksdl_android_jni.h"
-
 #include <unistd.h>
 #include "j4a/class/android/os/Build.h"
 #include "ijksdl_inc_internal_android.h"
@@ -195,23 +194,33 @@ int SDL_Android_GetApiLevel()
 #endif
 }
 
-
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
-{
-    int retval;
-    JNIEnv* env = NULL;
-
-    g_jvm = vm;
-    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK) {
-        return -1;
-    }
-
-    retval = J4A_LoadAll__catchAll(env);
-    JNI_CHECK_RET(retval == 0, env, NULL, NULL, -1);
-
-    return JNI_VERSION_1_4;
+int SDL_OnLoad(JavaVM *vm, JNIEnv *env) {
+  int retval = J4A_LoadAll__catchAll(env);
+  JNI_CHECK_RET(retval == 0, env, NULL, NULL, -1);
+  g_jvm = vm;
+  return JNI_VERSION_1_4;
 }
 
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, void *reserved)
-{
+void SDL_OnUnload() {
+
 }
+
+//JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
+//{
+//    int retval;
+//    JNIEnv* env = NULL;
+//
+//    g_jvm = vm;
+//    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK) {
+//        return -1;
+//    }
+//
+//    retval = J4A_LoadAll__catchAll(env);
+//    JNI_CHECK_RET(retval == 0, env, NULL, NULL, -1);
+//
+//    return JNI_VERSION_1_4;
+//}
+//
+//JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, void *reserved)
+//{
+//}

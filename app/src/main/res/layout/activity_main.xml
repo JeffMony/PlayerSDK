@@ -27,13 +27,14 @@
             android:layout_marginLeft="10dp"
             android:id="@+id/exo_btn"
             android:text="exo"
-            android:checked="true"
+            android:checked="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <RadioButton
             android:layout_marginLeft="10dp"
             android:id="@+id/ijk_btn"
             android:text="ijk"
+            android:checked="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
