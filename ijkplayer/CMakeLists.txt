@@ -8,7 +8,10 @@ set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../third_party)
 
 add_definitions("
 -DLIBYUV_NEON
+-DANDROID
+-DNDEBUG
 ")
+
 set(LIBYUV_DIR ${EXTRA_DIR}/ijkmedia/ijkyuv)
 
 set(IJKSOUNDTOUCH_DIR ${EXTRA_DIR}/ijksoundtouch)
@@ -182,7 +185,6 @@ target_link_libraries(
         EGL
         GLESv2
         log
-        jnigraphics
         libijkffmpeg
         libsoundtouch
         libyuv
