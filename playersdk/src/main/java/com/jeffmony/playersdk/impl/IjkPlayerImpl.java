@@ -5,7 +5,6 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.view.Surface;
 
-import com.jeffmony.playersdk.LogUtils;
 import com.jeffmony.playersdk.PlayerParams;
 
 import java.io.FileDescriptor;
@@ -25,26 +24,18 @@ public class IjkPlayerImpl extends PlayerImpl {
         mPlayer = new IjkMediaPlayer();
 
         //不用MediaCodec编解码
-        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER,
-            "mediacodec", 1);
+        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec", 1);
 
         //不用opensles编解码
-        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER,
-            "opensles", 0);
-        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER,
-            "overlay-format", IjkMediaPlayer.SDL_FCC_RV32);
-        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER,
-                "framedrop", 1);
-        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER,
-            "start-on-prepared", 0);
-        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT,
-            "http-detect-range-support", 0);
-        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT,
-            "timeout", 10000000);
-        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT,
-            "reconnect", 1);
-        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC,
-            "skip_loop_filter", 48);
+        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "opensles", 1);
+        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "overlay-format", IjkMediaPlayer.SDL_FCC_RV32);
+        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "framedrop", 1);
+        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
+        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "enable-accurate-seek", 1);
+        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "http-detect-range-support", 0);
+        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "timeout", 10000000);
+        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "reconnect", 1);
+        mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_loop_filter", 48);
         mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
         initPlayerListeners();
@@ -53,8 +44,8 @@ public class IjkPlayerImpl extends PlayerImpl {
     private void initPlayerListeners() {
         mPlayer.setOnPreparedListener(mOnPreparedListener);
         mPlayer.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
-//        mPlayer.setOnVideoDarSizeChangedListener(mOnVideoDarSizeChangedListener);
         mPlayer.setOnErrorListener(mOnErrorListener);
+        mPlayer.setOnSeekCompleteListener(mOnSeekCompleteListener);
     }
 
     @Override
@@ -195,6 +186,13 @@ public class IjkPlayerImpl extends PlayerImpl {
         public boolean onError(IMediaPlayer mp, int what, int extra) {
             notifyOnError(what, "" + extra);
             return true;
+        }
+    };
+
+    private IMediaPlayer.OnSeekCompleteListener mOnSeekCompleteListener = new IMediaPlayer.OnSeekCompleteListener() {
+        @Override
+        public void onSeekComplete(IMediaPlayer mp) {
+            notifyOnSeekComplete();
         }
     };
 

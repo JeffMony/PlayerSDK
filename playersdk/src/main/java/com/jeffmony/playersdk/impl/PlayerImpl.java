@@ -22,6 +22,8 @@ public class PlayerImpl implements IPlayer {
     private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
     private OnErrorListener mOnErrorListener;
     private OnCompletionListener mOnCompleteListener;
+
+    private OnSeekCompleteListener mOnSeekCompleteListener;
     private PlayerParams mParams;
 
     protected String mUrl;
@@ -86,6 +88,11 @@ public class PlayerImpl implements IPlayer {
     @Override
     public void setOnCompletionListener(OnCompletionListener listener) {
         mOnCompleteListener = listener;
+    }
+
+    @Override
+    public void setOnSeekCompleteListener(OnSeekCompleteListener listener) {
+        mOnSeekCompleteListener = listener;
     }
 
     @Override
@@ -166,6 +173,12 @@ public class PlayerImpl implements IPlayer {
     protected void notifyOnError(int what, String msg) {
         if (mOnErrorListener != null) {
             mOnErrorListener.onError(this, what, msg);
+        }
+    }
+
+    protected void notifyOnSeekComplete() {
+        if (mOnSeekCompleteListener != null) {
+            mOnSeekCompleteListener.onSeekComplete(this);
         }
     }
 }

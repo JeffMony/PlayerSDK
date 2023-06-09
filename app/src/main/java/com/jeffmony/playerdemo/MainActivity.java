@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Class<?> mCls;
     private boolean mIsContinuousScan;
-    private PlayerType mPlayerType = PlayerType.EXO_PLAYER;
+    private PlayerType mPlayerType = PlayerType.IJK_PLAYER;
     private boolean mUseOkHttp = false;
     private boolean mIsLoop;
 

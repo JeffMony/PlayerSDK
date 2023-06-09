@@ -251,6 +251,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mPlayer.setSurface(mSurface);
         mPlayer.setOnPreparedListener(mPrepareListener);
         mPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
+        mPlayer.setOnSeekCompleteListener(mOnSeekCompleteListener);
         mPlayer.prepareAsync();
     }
 
@@ -269,6 +270,12 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
             int videoWidth = mScreenWidth;
             int videoHeight = (int)((height * videoWidth * 1.0f)/ width);
             updateVideoSize(videoWidth, videoHeight);
+        }
+    };
+
+    private IPlayer.OnSeekCompleteListener mOnSeekCompleteListener = new IPlayer.OnSeekCompleteListener() {
+        @Override
+        public void onSeekComplete(IPlayer mp) {
         }
     };
 

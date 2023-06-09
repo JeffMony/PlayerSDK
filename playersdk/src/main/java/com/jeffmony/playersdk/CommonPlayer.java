@@ -15,7 +15,6 @@ import java.util.Map;
 public class CommonPlayer implements IPlayer {
 
     private PlayerImpl mPlayerImpl;
-    private PlayerType mType;
 
     public CommonPlayer(Context context) {
         this(context, PlayerType.EXO_PLAYER);
@@ -26,11 +25,7 @@ public class CommonPlayer implements IPlayer {
     }
 
     public CommonPlayer(Context context, PlayerType type, PlayerParams params) {
-        this.mType = type;
-
-        if (type == PlayerType.MEDIA_PLAYER) {
-//            mPlayerImpl = new MediaPlayerImpl(context, params);
-        } else if (type == PlayerType.EXO_PLAYER) {
+        if (type == PlayerType.EXO_PLAYER) {
             mPlayerImpl = new ExoPlayerImpl(context, params);
         } else if (type == PlayerType.IJK_PLAYER) {
             mPlayerImpl = new IjkPlayerImpl(context, params);
@@ -90,6 +85,11 @@ public class CommonPlayer implements IPlayer {
     @Override
     public void setOnCompletionListener(OnCompletionListener listener) {
         mPlayerImpl.setOnCompletionListener(listener);
+    }
+
+    @Override
+    public void setOnSeekCompleteListener(OnSeekCompleteListener listener) {
+        mPlayerImpl.setOnSeekCompleteListener(listener);
     }
 
     @Override

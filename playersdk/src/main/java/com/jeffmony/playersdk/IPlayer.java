@@ -63,6 +63,8 @@ public interface IPlayer {
 
     void setOnCompletionListener(OnCompletionListener listener);
 
+    void setOnSeekCompleteListener(OnSeekCompleteListener listener);
+
     interface OnCompletionListener {
         void onCompletion(IPlayer mp);
     }
@@ -72,13 +74,18 @@ public interface IPlayer {
     }
 
     interface OnVideoSizeChangedListener {
-        void onVideoSizeChanged(IPlayer mp, int width, int height,
-                                int rotationDegree,
-                                float pixelRatio,
-                                float darRatio);
+        void onVideoSizeChanged(
+                IPlayer mp, int width, int height,
+                int rotationDegree,
+                float pixelRatio,
+                float darRatio);
     }
 
     interface OnErrorListener {
         void onError(IPlayer mp, int what, String msg);
+    }
+
+    interface OnSeekCompleteListener {
+        void onSeekComplete(IPlayer mp);
     }
 }
