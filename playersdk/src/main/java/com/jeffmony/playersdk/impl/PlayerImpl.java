@@ -2,14 +2,11 @@ package com.jeffmony.playersdk.impl;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Message;
 import android.view.Surface;
 
 import com.jeffmony.playersdk.IPlayer;
 import com.jeffmony.playersdk.LogUtils;
 import com.jeffmony.playersdk.PlayerParams;
-import com.jeffmony.playersdk.WeakHandler;
 import com.jeffmony.playersdk.manager.PlayerManager;
 
 import java.io.FileDescriptor;
@@ -24,6 +21,8 @@ public class PlayerImpl implements IPlayer {
     private OnCompletionListener mOnCompleteListener;
 
     private OnSeekCompleteListener mOnSeekCompleteListener;
+
+    private OnAccurateSeekCompleteListener mOnAccurateSeekCompleteListener;
     private PlayerParams mParams;
 
     protected String mUrl;
@@ -93,6 +92,11 @@ public class PlayerImpl implements IPlayer {
     @Override
     public void setOnSeekCompleteListener(OnSeekCompleteListener listener) {
         mOnSeekCompleteListener = listener;
+    }
+
+    @Override
+    public void setOnAccurateSeekCompleteListener(OnAccurateSeekCompleteListener listener) {
+        mOnAccurateSeekCompleteListener = listener;
     }
 
     @Override
@@ -179,6 +183,12 @@ public class PlayerImpl implements IPlayer {
     protected void notifyOnSeekComplete() {
         if (mOnSeekCompleteListener != null) {
             mOnSeekCompleteListener.onSeekComplete(this);
+        }
+    }
+
+    protected void notifyOnAccurateSeekComplete() {
+        if (mOnAccurateSeekCompleteListener != null) {
+            mOnAccurateSeekCompleteListener.onSeekComplete(this);
         }
     }
 }

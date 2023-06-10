@@ -65,6 +65,8 @@ public interface IPlayer {
 
     void setOnSeekCompleteListener(OnSeekCompleteListener listener);
 
+    void setOnAccurateSeekCompleteListener(OnAccurateSeekCompleteListener listener);
+
     interface OnCompletionListener {
         void onCompletion(IPlayer mp);
     }
@@ -88,4 +90,9 @@ public interface IPlayer {
     interface OnSeekCompleteListener {
         void onSeekComplete(IPlayer mp);
     }
+
+    interface OnAccurateSeekCompleteListener {
+        void onSeekComplete(IPlayer mp);
+    }
+
 }

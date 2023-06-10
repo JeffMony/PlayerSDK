@@ -78,6 +78,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private static final int MEDIA_ERROR = 100;
     private static final int MEDIA_INFO = 200;
 
+    private static final int MEDIA_ACCURATE_SEEK_COMPLETE = 10100;
+
     protected static final int MEDIA_SET_VIDEO_SAR = 10001;
     protected static final int MEDIA_SET_VIDEO_DAR = 10002;
 
@@ -1030,6 +1032,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                     case MEDIA_INFO_VIDEO_RENDERING_START:
                         DebugLog.i(TAG, "Info: MEDIA_INFO_VIDEO_RENDERING_START\n");
                         break;
+                    case MEDIA_INFO_MEDIA_ACCURATE_SEEK_COMPLETE:
+                        break;
                 }
                 player.notifyOnInfo(msg.arg1, msg.arg2);
                 // No real default action so far.
@@ -1057,6 +1061,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 player.notifyOnVideoDarSizeChanged(player.mVideoWidth, player.mVideoHeight,
                         player.mVideoSarNum, player.mVideoSarDen, player.mVideoDarNum, player.mVideoDarDen);
                 break;
+
             default:
                 DebugLog.e(TAG, "Unknown message type " + msg.what);
             }

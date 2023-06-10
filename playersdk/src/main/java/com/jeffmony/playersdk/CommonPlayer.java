@@ -93,6 +93,11 @@ public class CommonPlayer implements IPlayer {
     }
 
     @Override
+    public void setOnAccurateSeekCompleteListener(OnAccurateSeekCompleteListener listener) {
+        mPlayerImpl.setOnAccurateSeekCompleteListener(listener);
+    }
+
+    @Override
     public void prepareAsync() throws IllegalStateException {
         mPlayerImpl.prepareAsync();
     }

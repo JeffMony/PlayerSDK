@@ -252,6 +252,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mPlayer.setOnPreparedListener(mPrepareListener);
         mPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
         mPlayer.setOnSeekCompleteListener(mOnSeekCompleteListener);
+        mPlayer.setOnAccurateSeekCompleteListener(mOnAccurateSeekCompleteListener);
         mPlayer.prepareAsync();
     }
 
@@ -276,6 +277,14 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private IPlayer.OnSeekCompleteListener mOnSeekCompleteListener = new IPlayer.OnSeekCompleteListener() {
         @Override
         public void onSeekComplete(IPlayer mp) {
+            LogUtils.e("player_sdk seek complete");
+        }
+    };
+
+    private IPlayer.OnAccurateSeekCompleteListener mOnAccurateSeekCompleteListener = new IPlayer.OnAccurateSeekCompleteListener() {
+        @Override
+        public void onSeekComplete(IPlayer mp) {
+            LogUtils.e("player_sdk accurate seek complete");
         }
     };
 
@@ -298,6 +307,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
                 int progress = mProgressView.getProgress();
                 long seekPosition = (long) (progress * 1.0f / MAX_PROGRESS * mTotalDuration);
                 mPlayer.seekTo(seekPosition);
+                LogUtils.e("player_sdk seekTo");
                 mHandler.sendEmptyMessage(MSG_UPDATE_PROGRESS);
             }
         }

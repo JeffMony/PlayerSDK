@@ -46,6 +46,7 @@ public class IjkPlayerImpl extends PlayerImpl {
         mPlayer.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
         mPlayer.setOnErrorListener(mOnErrorListener);
         mPlayer.setOnSeekCompleteListener(mOnSeekCompleteListener);
+        mPlayer.setOnInfoListener(mOnInfoListener);
     }
 
     @Override
@@ -193,6 +194,16 @@ public class IjkPlayerImpl extends PlayerImpl {
         @Override
         public void onSeekComplete(IMediaPlayer mp) {
             notifyOnSeekComplete();
+        }
+    };
+
+    private IMediaPlayer.OnInfoListener mOnInfoListener = new IMediaPlayer.OnInfoListener() {
+        @Override
+        public boolean onInfo(IMediaPlayer mp, int what, int extra) {
+            if (what == IMediaPlayer.MEDIA_INFO_MEDIA_ACCURATE_SEEK_COMPLETE) {
+                notifyOnAccurateSeekComplete();
+            }
+            return false;
         }
     };
 
