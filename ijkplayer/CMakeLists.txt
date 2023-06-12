@@ -14,7 +14,7 @@ add_definitions("
 
 set(LIBYUV_DIR ${EXTRA_DIR}/ijkmedia/ijkyuv)
 
-set(IJKSOUNDTOUCH_DIR ${EXTRA_DIR}/ijksoundtouch)
+set(IJKSOUNDTOUCH_DIR ${EXTRA_DIR}/ijkmedia/ijksoundtouch)
 
 set(IJKJ4A_DIR ${EXTRA_DIR}/ijkmedia/ijkj4a)
 
@@ -29,6 +29,8 @@ include_directories(${FFMPEG_DIR}/${ANDROID_ABI}/include)
 include_directories(${EXTRA_DIR}/ijkmedia)
 
 include_directories(${LIBYUV_DIR}/include)
+
+include_directories(${IJKSOUNDTOUCH_DIR})
 
 include_directories(${IJKSOUNDTOUCH_DIR}/include)
 
@@ -156,14 +158,81 @@ file(
         ${IJKPLAYER_DIR}/ijkavutil/ijkstl.cpp
 )
 
-add_library(libcpufeatures STATIC IMPORTED)
-set_target_properties(libcpufeatures PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/cpufeatures/${ANDROID_ABI}/libcpufeatures.a)
+file(
+        GLOB
+        ijksoundtouch_source
 
-add_library(libyuv STATIC IMPORTED)
-set_target_properties(libyuv PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/libyuv/${ANDROID_ABI}/libyuv_static.a)
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/AAFilter.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/FIFOSampleBuffer.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/FIRFilter.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/cpu_detect_x86.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/sse_optimized.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/RateTransposer.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/InterpolateCubic.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/InterpolateLinear.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/InterpolateShannon.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/TDStretch.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/BPMDetect.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/PeakFinder.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/SoundTouch.cpp
+        ${IJKSOUNDTOUCH_DIR}/source/SoundTouch/mmx_optimized.cpp
+        ${IJKSOUNDTOUCH_DIR}/ijksoundtouch_wrap.cpp
+)
 
-add_library(libsoundtouch STATIC IMPORTED)
-set_target_properties(libsoundtouch PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/soundtouch/${ANDROID_ABI}/libijksoundtouch.a)
+file(
+        GLOB
+        ijkyuv_common_source
+
+        ${LIBYUV_DIR}/source/compare.cc
+        ${LIBYUV_DIR}/source/compare_common.cc
+        ${LIBYUV_DIR}/source/compare_posix.cc
+        ${LIBYUV_DIR}/source/convert.cc
+        ${LIBYUV_DIR}/source/convert_argb.cc
+        ${LIBYUV_DIR}/source/convert_from.cc
+        ${LIBYUV_DIR}/source/convert_from_argb.cc
+        ${LIBYUV_DIR}/source/convert_to_argb.cc
+        ${LIBYUV_DIR}/source/convert_to_i420.cc
+        ${LIBYUV_DIR}/source/cpu_id.cc
+        ${LIBYUV_DIR}/source/format_conversion.cc
+        ${LIBYUV_DIR}/source/planar_functions.cc
+        ${LIBYUV_DIR}/source/rotate.cc
+        ${LIBYUV_DIR}/source/rotate_argb.cc
+        ${LIBYUV_DIR}/source/rotate_mips.cc
+        ${LIBYUV_DIR}/source/row_any.cc
+        ${LIBYUV_DIR}/source/row_common.cc
+        ${LIBYUV_DIR}/source/row_mips.cc
+        ${LIBYUV_DIR}/source/row_posix.cc
+        ${LIBYUV_DIR}/source/scale.cc
+        ${LIBYUV_DIR}/source/scale_argb.cc
+        ${LIBYUV_DIR}/source/scale_common.cc
+        ${LIBYUV_DIR}/source/scale_mips.cc
+        ${LIBYUV_DIR}/source/scale_posix.cc
+        ${LIBYUV_DIR}/source/video_common.cc
+)
+
+if (${ANDROID_ABI} STREQUAL "arm64-v8a")
+    file(
+            GLOB
+            ijkyuv_source
+
+            ${LIBYUV_DIR}/source/compare_neon64.cc
+            ${LIBYUV_DIR}/source/rotate_neon64.cc
+            ${LIBYUV_DIR}/source/row_neon64.cc
+            ${LIBYUV_DIR}/source/scale_neon64.cc
+            ${ijkyuv_common_source}
+    )
+else()
+    file(
+            GLOB
+            ijkyuv_source
+
+            ${LIBYUV_DIR}/source/compare_neon.cc
+            ${LIBYUV_DIR}/source/rotate_neon.cc
+            ${LIBYUV_DIR}/source/row_neon.cc
+            ${LIBYUV_DIR}/source/scale_neon.cc
+            ${ijkyuv_common_source}
+    )
+endif()
 
 add_library(libijkffmpeg SHARED IMPORTED)
 set_target_properties(libijkffmpeg PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/ffmpeg/${ANDROID_ABI}/libijkffmpeg.so)
@@ -174,6 +243,8 @@ add_library(
         ${ijkplayer_source}
         ${ijksdl_source}
         ${ijkj4a_source}
+        ${ijksoundtouch_source}
+        ${ijkyuv_source}
         ${EXTRA_DIR}/ijkmedia/media_jni.cc
         ${EXTRA_DIR}/ijkprof/android-ndk-profiler-dummy/jni/prof.c
 )
@@ -186,8 +257,5 @@ target_link_libraries(
         GLESv2
         log
         libijkffmpeg
-        libsoundtouch
-        libyuv
-        libcpufeatures
 )
 
