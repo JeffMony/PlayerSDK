@@ -1570,7 +1570,10 @@ static int queue_picture(FFPlayer *ffp, AVFrame *src_frame, double pts, double d
                     if (video_seek_pos == is->seek_pos && is->audio_accurate_seek_req && !is->abort_request) {
                         SDL_CondWaitTimeout(is->video_accurate_seek_cond, is->accurate_seek_mutex, ffp->accurate_seek_timeout);
                     } else {
-                        ffp_notify_msg2(ffp, FFP_MSG_ACCURATE_SEEK_COMPLETE, (int)(pts * 1000));
+                        int seek_complete_pos = (int)(pts * 1000);
+                        int cost_time = (int)(av_gettime_relative() - is->seek_start_time) / 1000;
+                        ALOGI("video FFP_MSG_ACCURATE_SEEK_COMPLETE cost_time=%d", cost_time);
+                        ffp_notify_msg2(ffp, FFP_MSG_ACCURATE_SEEK_COMPLETE, seek_complete_pos);
                     }
                     if (video_seek_pos != is->seek_pos && !is->abort_request) {
                         is->video_accurate_seek_req = 1;
@@ -2059,7 +2062,10 @@ static int audio_thread(void *arg)
                                 if (audio_seek_pos == is->seek_pos && is->video_accurate_seek_req && !is->abort_request) {
                                     SDL_CondWaitTimeout(is->audio_accurate_seek_cond, is->accurate_seek_mutex, ffp->accurate_seek_timeout);
                                 } else {
-                                    ffp_notify_msg2(ffp, FFP_MSG_ACCURATE_SEEK_COMPLETE, (int)(audio_clock * 1000));
+                                    int seek_complete_pos = (int)(audio_clock * 1000);
+                                    int cost_time = (int)(av_gettime_relative() - is->seek_start_time) / 1000;
+                                    ALOGI("audio FFP_MSG_ACCURATE_SEEK_COMPLETE cost_time=%d", cost_time);
+                                    ffp_notify_msg2(ffp, FFP_MSG_ACCURATE_SEEK_COMPLETE, seek_complete_pos);
                                 }
 
                                 if (audio_seek_pos != is->seek_pos && !is->abort_request) {
@@ -4412,6 +4418,7 @@ int ffp_seek_to_l(FFPlayer *ffp, long msec)
     // FIXME: 9 seek out of range
     // FIXME: 9 seekable
     av_log(ffp, AV_LOG_DEBUG, "stream_seek %"PRId64"(%d) + %"PRId64", \n", seek_pos, (int)msec, start_time);
+    is->seek_start_time = av_gettime_relative();
     stream_seek(is, seek_pos, 0, 0);
     return 0;
 }

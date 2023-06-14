@@ -62,9 +62,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mIjkBtn = findViewById(R.id.ijk_btn);
         mOkHttpBox = findViewById(R.id.okhttp_box);
         mGLPlayerBtn = findViewById(R.id.gl_player_btn);
-        //http://videocdn.mviplay.cn/video/283665.mp4
-        //http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8
-        mUrlText.setText("http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8");
+        // http://videocdn.mviplay.cn/video/283665.mp4
+        // http://sns-video-bd.xhscdn.com/stream/110/258/01e4326d8b792647010370038764ff7d3c_258.mp4
+        // http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8
+        mUrlText.setText("http://sns-video-bd.xhscdn.com/stream/110/258/01e4326d8b792647010370038764ff7d3c_258.mp4");
 
         mExoBtn.setOnClickListener(this);
         mIjkBtn.setOnClickListener(this);

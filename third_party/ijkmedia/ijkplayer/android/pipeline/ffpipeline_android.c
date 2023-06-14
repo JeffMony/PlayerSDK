@@ -82,6 +82,7 @@ static IJKFF_Pipenode *func_open_video_decoder(IJKFF_Pipeline *pipeline, FFPlaye
 static SDL_Aout *func_open_audio_output(IJKFF_Pipeline *pipeline, FFPlayer *ffp)
 {
     SDL_Aout *aout = NULL;
+    ffp->opensles = 1;
     if (ffp->opensles) {
         aout = SDL_AoutAndroid_CreateForOpenSLES();
     } else {

@@ -41,7 +41,7 @@
 //#define SDLTRACE ALOGW
 #endif
 
-#define OPENSLES_BUFFERS 255 /* maximum number of buffers */
+#define OPENSLES_BUFFERS 5 /* maximum number of buffers */
 #define OPENSLES_BUFLEN  10 /* ms */
 
 static SDL_Class g_opensles_class = {
@@ -129,6 +129,8 @@ static int aout_thread_n(SDL_Aout *aout)
     size_t                         bytes_per_buffer = opaque->bytes_per_buffer;
 
     SDL_SetThreadPriority(SDL_THREAD_PRIORITY_HIGH);
+    int32_t last_audio_position = 0;
+    int32_t opensl_render_audio_time = 0;
 
     if (!opaque->abort_request && !opaque->pause_on)
         (*slPlayItf)->SetPlayState(slPlayItf, SL_PLAYSTATE_PLAYING);
@@ -157,6 +159,19 @@ static int aout_thread_n(SDL_Aout *aout)
 
                 if (opaque->pause_on)
                     (*slPlayItf)->SetPlayState(slPlayItf, SL_PLAYSTATE_PAUSED);
+
+                int32_t audio_position;
+                int32_t audio_duration;
+                (*slPlayItf)->GetPosition(slPlayItf, &audio_position);
+                (*slPlayItf)->GetDuration(slPlayItf, &audio_duration);
+                if (audio_position > 0) {
+                    if (audio_position > last_audio_position) {
+                        opensl_render_audio_time += (audio_position - last_audio_position);
+                    }
+                } else {
+                    audio_position = 0;
+                }
+                last_audio_position = audio_position;
             }
             if (!opaque->abort_request && !opaque->pause_on) {
                 (*slPlayItf)->SetPlayState(slPlayItf, SL_PLAYSTATE_PLAYING);
