@@ -241,7 +241,7 @@ static void aout_opensles_callback(SLAndroidSimpleBufferQueueItf caller, void *p
     SDL_Aout        *aout   = pContext;
     SDL_Aout_Opaque *opaque = aout->opaque;
 
-    if (opaque) {
+    if (opaque && !opaque->abort_request) {
         SDL_LockMutex(opaque->wakeup_mutex);
         opaque->is_running = true;
         SDL_CondSignal(opaque->wakeup_cond);
@@ -253,7 +253,7 @@ static void aout_close_audio(SDL_Aout *aout)
 {
     SDLTRACE("aout_close_audio()\n");
     SDL_Aout_Opaque *opaque = aout->opaque;
-    if (!opaque)
+    if (!opaque || opaque->abort_request)
         return;
 
     SDL_LockMutex(opaque->wakeup_mutex);
@@ -452,6 +452,9 @@ fail:
 static void aout_pause_audio(SDL_Aout *aout, int pause_on)
 {
     SDL_Aout_Opaque *opaque = aout->opaque;
+    if (opaque->abort_request) {
+        return;
+    }
 
     SDL_LockMutex(opaque->wakeup_mutex);
     SDLTRACE("aout_pause_audio(%d)", pause_on);
@@ -464,6 +467,9 @@ static void aout_pause_audio(SDL_Aout *aout, int pause_on)
 static void aout_flush_audio(SDL_Aout *aout)
 {
     SDL_Aout_Opaque *opaque = aout->opaque;
+    if (opaque->abort_request) {
+        return;
+    }
     SDL_LockMutex(opaque->wakeup_mutex);
     SDLTRACE("aout_flush_audio()");
     opaque->need_flush = 1;
@@ -474,6 +480,9 @@ static void aout_flush_audio(SDL_Aout *aout)
 static void aout_set_volume(SDL_Aout *aout, float left_volume, float right_volume)
 {
     SDL_Aout_Opaque *opaque = aout->opaque;
+    if (opaque->abort_request) {
+        return;
+    }
     SDL_LockMutex(opaque->wakeup_mutex);
     ALOGI("aout_set_volume(%f, %f)", left_volume, right_volume);
     opaque->left_volume = left_volume;
