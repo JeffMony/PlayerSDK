@@ -3322,6 +3322,18 @@ static int read_thread(void *arg)
     } else {
         assert("invalid streams");
     }
+    if (is->video_stream >= 0) {
+        AVIndexEntry *entries = ic->streams[is->video_stream]->index_entries;
+        int entry_size = ic->streams[is->video_stream]->nb_index_entries;
+        int key_count = 0;
+        for (int i = 0; i < entry_size; i++) {
+            AVIndexEntry entry = entries[i];
+            if (entry.flags & AV_PKT_FLAG_KEY) {
+                key_count++;
+                int64_t key_timestamp = av_rescale_q(entry.timestamp, ic->streams[is->video_stream]->time_base, AV_TIME_BASE_Q) / 1000;
+            }
+        }
+    }
 
     if (ffp->infinite_buffer < 0 && is->realtime)
         ffp->infinite_buffer = 1;
