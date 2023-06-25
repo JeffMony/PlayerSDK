@@ -10,7 +10,7 @@ set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../third_party)
 
 add_definitions("
 -DLIBYUV_NEON
--DANDROID
+-D__ANDROID__
 -DNDEBUG
 ")
 

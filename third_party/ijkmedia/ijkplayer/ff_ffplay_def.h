@@ -419,6 +419,8 @@ typedef struct VideoState {
     volatile int initialized_decoder;
     int seek_buffering;
     int64_t seek_start_time;
+    int seek_frame_nums;
+    int seek_non_ref_frame_nums;
 } VideoState;
 
 /* options specified by the user */

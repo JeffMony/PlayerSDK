@@ -105,6 +105,7 @@
 
 // static const AVOption ffp_context_options[] = ...
 #include "ff_ffplay_options.h"
+#include "libavcodec/hevc.h"
 
 static AVPacket flush_pkt;
 
@@ -1573,6 +1574,7 @@ static int queue_picture(FFPlayer *ffp, AVFrame *src_frame, double pts, double d
                         int seek_complete_pos = (int)(pts * 1000);
                         int cost_time = (int)(av_gettime_relative() - is->seek_start_time) / 1000;
                         ALOGI("video FFP_MSG_ACCURATE_SEEK_COMPLETE cost_time=%d", cost_time);
+                        ALOGI("video FFP_MSG_ACCURATE_SEEK_COMPLETE frame_nums=%d, non_frame_nums=%d", is->seek_frame_nums, is->seek_non_ref_frame_nums);
                         ffp_notify_msg2(ffp, FFP_MSG_ACCURATE_SEEK_COMPLETE, seek_complete_pos);
                     }
                     if (video_seek_pos != is->seek_pos && !is->abort_request) {
@@ -2065,6 +2067,7 @@ static int audio_thread(void *arg)
                                     int seek_complete_pos = (int)(audio_clock * 1000);
                                     int cost_time = (int)(av_gettime_relative() - is->seek_start_time) / 1000;
                                     ALOGI("audio FFP_MSG_ACCURATE_SEEK_COMPLETE cost_time=%d", cost_time);
+                                    ALOGI("audio FFP_MSG_ACCURATE_SEEK_COMPLETE frame_nums=%d, non_frame_nums=%d", is->seek_frame_nums, is->seek_non_ref_frame_nums);
                                     ffp_notify_msg2(ffp, FFP_MSG_ACCURATE_SEEK_COMPLETE, seek_complete_pos);
                                 }
 
@@ -3607,7 +3610,48 @@ static int read_thread(void *arg)
             packet_queue_put(&is->audioq, pkt);
         } else if (pkt->stream_index == is->video_stream && pkt_in_play_range
                    && !(is->video_st && (is->video_st->disposition & AV_DISPOSITION_ATTACHED_PIC))) {
-            packet_queue_put(&is->videoq, pkt);
+            if (is->video_accurate_seek_req) {
+                if (is->video_st->codecpar->codec_id == AV_CODEC_ID_H264) {
+                    is->seek_frame_nums++;
+                    uint8_t nal_unit_type = pkt->data[4] & 0x1f;
+                    uint8_t nal_ref_idc = (pkt->data[4] >> 5) & 0x03;
+                    int64_t pkt_time = av_rescale_q(pkt->pts, is->video_st->time_base, AV_TIME_BASE_Q) / 1000;
+                    if (nal_ref_idc == 0) {
+                        /// seek点附近的帧不能丢弃
+                        if (abs(pkt_time - is->seek_pos / 1000) < 100) {
+                            packet_queue_put(&is->videoq, pkt);
+                        } else {
+                            is->seek_non_ref_frame_nums++;
+                            av_packet_unref(pkt);
+                        }
+                    } else {
+                        packet_queue_put(&is->videoq, pkt);
+                    }
+                } else if (is->video_st->codecpar->codec_id == AV_CODEC_ID_H265) {
+                    uint8_t nal_unit_type = pkt->data[4] & 0x1f;
+                    uint8_t nal_ref_idc = (pkt->data[4] >> 5) & 0x03;
+                    int64_t pkt_time = av_rescale_q(pkt->pts, is->video_st->time_base, AV_TIME_BASE_Q) / 1000;
+                    if (nal_unit_type == HEVC_NAL_TRAIL_N ||
+                        nal_unit_type == HEVC_NAL_TSA_N ||
+                        nal_unit_type == HEVC_NAL_STSA_N ||
+                        nal_unit_type == HEVC_NAL_RADL_N ||
+                        nal_unit_type == HEVC_NAL_RASL_N) {
+                        /// seek点附近的帧不能丢弃
+                        if (abs(pkt_time - is->seek_pos / 1000) < 100) {
+                            packet_queue_put(&is->videoq, pkt);
+                        } else {
+                            is->seek_non_ref_frame_nums++;
+                            av_packet_unref(pkt);
+                        }
+                    } else {
+                        packet_queue_put(&is->videoq, pkt);
+                    }
+                } else {
+                    packet_queue_put(&is->videoq, pkt);
+                }
+            } else {
+                packet_queue_put(&is->videoq, pkt);
+            }
         } else if (pkt->stream_index == is->subtitle_stream && pkt_in_play_range) {
             packet_queue_put(&is->subtitleq, pkt);
         } else {
@@ -4431,6 +4475,8 @@ int ffp_seek_to_l(FFPlayer *ffp, long msec)
     // FIXME: 9 seekable
     av_log(ffp, AV_LOG_DEBUG, "stream_seek %"PRId64"(%d) + %"PRId64", \n", seek_pos, (int)msec, start_time);
     is->seek_start_time = av_gettime_relative();
+    is->seek_frame_nums = 0;
+    is->seek_non_ref_frame_nums = 0;
     stream_seek(is, seek_pos, 0, 0);
     return 0;
 }

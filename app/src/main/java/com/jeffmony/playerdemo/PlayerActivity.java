@@ -193,8 +193,8 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         @Override
-        public void onMutipleVideo(List<M3U8Seg> urlList) {
-            LogUtils.e("onMutipleVideo : size="+urlList.size());
+        public void onMultipleVideo(List<M3U8Seg> urlList) {
+            LogUtils.e("onMultipleVideo : size="+urlList.size());
             Message message = Message.obtain();
             message.what = MSG_MULTIPLE_VIDEO;
             message.obj = urlList;

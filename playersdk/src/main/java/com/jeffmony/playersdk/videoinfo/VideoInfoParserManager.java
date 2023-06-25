@@ -96,7 +96,7 @@ public class VideoInfoParserManager {
 
         m3u8.setCount(segList.size());
         m3u8.setSegList(segList);
-        videoInfoCallback.onMutipleVideo(segList);
+        videoInfoCallback.onMultipleVideo(segList);
         if (bufferedReader != null) {
             bufferedReader.close();
         }

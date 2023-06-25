@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface IVideoInfoCallback {
   void onVideoType(String contentType, String name);
-  void onMutipleVideo(List<M3U8Seg> urlList);
+  void onMultipleVideo(List<M3U8Seg> urlList);
   void onFailed(Exception e);
 }
