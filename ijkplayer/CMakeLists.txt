@@ -261,3 +261,8 @@ target_link_libraries(
         libijkffmpeg
 )
 
+if (USE_ASAN STREQUAL "true")
+    target_compile_options(jm_player PUBLIC -fsanitize=address -fno-omit-frame-pointer)
+    set_target_properties(jm_player PROPERTIES LINK_FLAGS -fsanitize=address)
+endif()
+
