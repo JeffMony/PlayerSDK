@@ -1177,6 +1177,9 @@ static void stream_seek(VideoState *is, int64_t pos, int64_t rel, int seek_by_by
         if (seek_by_bytes)
             is->seek_flags |= AVSEEK_FLAG_BYTE;
         is->seek_req = 1;
+        is->seek_start_time = av_gettime_relative();
+        is->seek_frame_nums = 0;
+        is->seek_non_ref_frame_nums = 0;
         SDL_CondSignal(is->continue_read_thread);
     }
 }
@@ -3613,7 +3616,6 @@ static int read_thread(void *arg)
             if (is->video_accurate_seek_req) {
                 if (is->video_st->codecpar->codec_id == AV_CODEC_ID_H264) {
                     is->seek_frame_nums++;
-                    uint8_t nal_unit_type = pkt->data[4] & 0x1f;
                     uint8_t nal_ref_idc = (pkt->data[4] >> 5) & 0x03;
                     int64_t pkt_time = av_rescale_q(pkt->pts, is->video_st->time_base, AV_TIME_BASE_Q) / 1000;
                     if (nal_ref_idc == 0) {
@@ -3628,8 +3630,7 @@ static int read_thread(void *arg)
                         packet_queue_put(&is->videoq, pkt);
                     }
                 } else if (is->video_st->codecpar->codec_id == AV_CODEC_ID_H265) {
-                    uint8_t nal_unit_type = pkt->data[4] & 0x1f;
-                    uint8_t nal_ref_idc = (pkt->data[4] >> 5) & 0x03;
+                    uint8_t nal_unit_type = (pkt->data[4] & 0x7e) >> 1;
                     int64_t pkt_time = av_rescale_q(pkt->pts, is->video_st->time_base, AV_TIME_BASE_Q) / 1000;
                     if (nal_unit_type == HEVC_NAL_TRAIL_N ||
                         nal_unit_type == HEVC_NAL_TSA_N ||
@@ -4474,9 +4475,6 @@ int ffp_seek_to_l(FFPlayer *ffp, long msec)
     // FIXME: 9 seek out of range
     // FIXME: 9 seekable
     av_log(ffp, AV_LOG_DEBUG, "stream_seek %"PRId64"(%d) + %"PRId64", \n", seek_pos, (int)msec, start_time);
-    is->seek_start_time = av_gettime_relative();
-    is->seek_frame_nums = 0;
-    is->seek_non_ref_frame_nums = 0;
     stream_seek(is, seek_pos, 0, 0);
     return 0;
 }
