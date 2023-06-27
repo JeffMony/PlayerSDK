@@ -51,6 +51,7 @@ static SDL_Class g_opensles_class = {
 typedef struct SDL_Aout_Opaque {
     SDL_cond   *wakeup_cond;
     SDL_mutex  *wakeup_mutex;
+    volatile int mutex_locked;
 
     SDL_Thread *audio_tid;
     SDL_Thread _audio_tid;
@@ -141,10 +142,18 @@ static int aout_thread_n(SDL_Aout *aout)
         SLresult slRet = (*slBufferQueueItf)->GetState(slBufferQueueItf, &slState);
         if (slRet != SL_RESULT_SUCCESS) {
             ALOGE("%s: slBufferQueueItf->GetState() failed\n", __func__);
-            SDL_UnlockMutex(opaque->wakeup_mutex);
+            if (opaque->mutex_locked) {
+                if (SDL_UnlockMutex(opaque->wakeup_mutex) == 0) {
+                    opaque->mutex_locked = 0;
+                }
+            }
         }
 
-        SDL_LockMutex(opaque->wakeup_mutex);
+        if (!opaque->mutex_locked) {
+            if (SDL_LockMutex(opaque->wakeup_mutex) == 0) {
+                opaque->mutex_locked = 1;
+            }
+        }
         if (!opaque->abort_request && (opaque->pause_on || slState.count >= OPENSLES_BUFFERS)) {
             while (!opaque->abort_request && (opaque->pause_on || slState.count >= OPENSLES_BUFFERS)) {
                 if (!opaque->pause_on) {
@@ -154,7 +163,11 @@ static int aout_thread_n(SDL_Aout *aout)
                 SLresult slRet = (*slBufferQueueItf)->GetState(slBufferQueueItf, &slState);
                 if (slRet != SL_RESULT_SUCCESS) {
                     ALOGE("%s: slBufferQueueItf->GetState() failed\n", __func__);
-                    SDL_UnlockMutex(opaque->wakeup_mutex);
+                    if (opaque->mutex_locked) {
+                        if (SDL_UnlockMutex(opaque->wakeup_mutex) == 0) {
+                            opaque->mutex_locked = 0;
+                        }
+                    }
                 }
 
                 if (opaque->pause_on)
@@ -240,21 +253,22 @@ static void aout_opensles_callback(SLAndroidSimpleBufferQueueItf caller, void *p
     SDLTRACE("%s\n", __func__);
     SDL_Aout        *aout   = pContext;
     SDL_Aout_Opaque *opaque = aout->opaque;
-
-    if (opaque && !opaque->abort_request) {
-        SDL_LockMutex(opaque->wakeup_mutex);
-        opaque->is_running = true;
-        SDL_CondSignal(opaque->wakeup_cond);
-        SDL_UnlockMutex(opaque->wakeup_mutex);
+    if (!opaque || opaque->abort_request) {
+        return;
     }
+    SDL_LockMutex(opaque->wakeup_mutex);
+    opaque->is_running = true;
+    SDL_CondSignal(opaque->wakeup_cond);
+    SDL_UnlockMutex(opaque->wakeup_mutex);
 }
 
 static void aout_close_audio(SDL_Aout *aout)
 {
     SDLTRACE("aout_close_audio()\n");
     SDL_Aout_Opaque *opaque = aout->opaque;
-    if (!opaque || opaque->abort_request)
+    if (!opaque || opaque->abort_request) {
         return;
+    }
 
     SDL_LockMutex(opaque->wakeup_mutex);
     opaque->abort_request = true;
@@ -452,7 +466,7 @@ fail:
 static void aout_pause_audio(SDL_Aout *aout, int pause_on)
 {
     SDL_Aout_Opaque *opaque = aout->opaque;
-    if (opaque->abort_request) {
+    if (!opaque || opaque->abort_request) {
         return;
     }
 
@@ -467,7 +481,7 @@ static void aout_pause_audio(SDL_Aout *aout, int pause_on)
 static void aout_flush_audio(SDL_Aout *aout)
 {
     SDL_Aout_Opaque *opaque = aout->opaque;
-    if (opaque->abort_request) {
+    if (!opaque || opaque->abort_request) {
         return;
     }
     SDL_LockMutex(opaque->wakeup_mutex);
@@ -480,7 +494,7 @@ static void aout_flush_audio(SDL_Aout *aout)
 static void aout_set_volume(SDL_Aout *aout, float left_volume, float right_volume)
 {
     SDL_Aout_Opaque *opaque = aout->opaque;
-    if (opaque->abort_request) {
+    if (!opaque || opaque->abort_request) {
         return;
     }
     SDL_LockMutex(opaque->wakeup_mutex);
@@ -518,6 +532,7 @@ SDL_Aout *SDL_AoutAndroid_CreateForOpenSLES()
     SDL_Aout_Opaque *opaque = aout->opaque;
     opaque->wakeup_cond = SDL_CreateCond();
     opaque->wakeup_mutex = SDL_CreateMutex();
+    opaque->mutex_locked = 0;
 
     int ret = 0;
 
