@@ -51,7 +51,6 @@ static SDL_Class g_opensles_class = {
 typedef struct SDL_Aout_Opaque {
     SDL_cond   *wakeup_cond;
     SDL_mutex  *wakeup_mutex;
-    volatile int mutex_locked;
 
     SDL_Thread *audio_tid;
     SDL_Thread _audio_tid;
@@ -142,18 +141,10 @@ static int aout_thread_n(SDL_Aout *aout)
         SLresult slRet = (*slBufferQueueItf)->GetState(slBufferQueueItf, &slState);
         if (slRet != SL_RESULT_SUCCESS) {
             ALOGE("%s: slBufferQueueItf->GetState() failed\n", __func__);
-            if (opaque->mutex_locked) {
-                if (SDL_UnlockMutex(opaque->wakeup_mutex) == 0) {
-                    opaque->mutex_locked = 0;
-                }
-            }
+            SDL_UnlockMutex(opaque->wakeup_mutex);
         }
 
-        if (!opaque->mutex_locked) {
-            if (SDL_LockMutex(opaque->wakeup_mutex) == 0) {
-                opaque->mutex_locked = 1;
-            }
-        }
+        SDL_LockMutex(opaque->wakeup_mutex);
         if (!opaque->abort_request && (opaque->pause_on || slState.count >= OPENSLES_BUFFERS)) {
             while (!opaque->abort_request && (opaque->pause_on || slState.count >= OPENSLES_BUFFERS)) {
                 if (!opaque->pause_on) {
@@ -163,11 +154,7 @@ static int aout_thread_n(SDL_Aout *aout)
                 SLresult slRet = (*slBufferQueueItf)->GetState(slBufferQueueItf, &slState);
                 if (slRet != SL_RESULT_SUCCESS) {
                     ALOGE("%s: slBufferQueueItf->GetState() failed\n", __func__);
-                    if (opaque->mutex_locked) {
-                        if (SDL_UnlockMutex(opaque->wakeup_mutex) == 0) {
-                            opaque->mutex_locked = 0;
-                        }
-                    }
+                    SDL_UnlockMutex(opaque->wakeup_mutex);
                 }
 
                 if (opaque->pause_on)
@@ -532,7 +519,6 @@ SDL_Aout *SDL_AoutAndroid_CreateForOpenSLES()
     SDL_Aout_Opaque *opaque = aout->opaque;
     opaque->wakeup_cond = SDL_CreateCond();
     opaque->wakeup_mutex = SDL_CreateMutex();
-    opaque->mutex_locked = 0;
 
     int ret = 0;
 
