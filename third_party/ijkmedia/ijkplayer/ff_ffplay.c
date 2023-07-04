@@ -1004,6 +1004,12 @@ static void stream_close(FFPlayer *ffp)
     av_log(NULL, AV_LOG_DEBUG, "wait for read_tid\n");
     SDL_WaitThread(is->read_tid, NULL);
 
+    if (ffp->key_frame_num > 0) {
+        ffp->key_frame_num = 0;
+        av_free(ffp->key_frames);
+        ffp->key_frames = NULL;
+    }
+
     /* close each stream */
     if (is->audio_stream >= 0)
         stream_component_close(ffp, is->audio_stream);
@@ -1577,7 +1583,7 @@ static int queue_picture(FFPlayer *ffp, AVFrame *src_frame, double pts, double d
                         int seek_complete_pos = (int)(pts * 1000);
                         int cost_time = (int)(av_gettime_relative() - is->seek_start_time) / 1000;
                         ALOGI("video FFP_MSG_ACCURATE_SEEK_COMPLETE cost_time=%d", cost_time);
-                        ALOGI("video FFP_MSG_ACCURATE_SEEK_COMPLETE frame_nums=%d, non_frame_nums=%d", is->seek_frame_nums, is->seek_non_ref_frame_nums);
+                        ALOGI("video FFP_MSG_ACCURATE_SEEK_COMPLETE frame_nums=%d, non_frame_nums=%d, seek_pos=%lld", is->seek_frame_nums, is->seek_non_ref_frame_nums, (int64_t)(is->seek_pos / 1000));
                         ffp_notify_msg2(ffp, FFP_MSG_ACCURATE_SEEK_COMPLETE, seek_complete_pos);
                     }
                     if (video_seek_pos != is->seek_pos && !is->abort_request) {
@@ -2070,7 +2076,7 @@ static int audio_thread(void *arg)
                                     int seek_complete_pos = (int)(audio_clock * 1000);
                                     int cost_time = (int)(av_gettime_relative() - is->seek_start_time) / 1000;
                                     ALOGI("audio FFP_MSG_ACCURATE_SEEK_COMPLETE cost_time=%d", cost_time);
-                                    ALOGI("audio FFP_MSG_ACCURATE_SEEK_COMPLETE frame_nums=%d, non_frame_nums=%d", is->seek_frame_nums, is->seek_non_ref_frame_nums);
+                                    ALOGI("audio FFP_MSG_ACCURATE_SEEK_COMPLETE frame_nums=%d, non_frame_nums=%d, seek_pos=%lld", is->seek_frame_nums, is->seek_non_ref_frame_nums, (int64_t)(is->seek_pos / 1000));
                                     ffp_notify_msg2(ffp, FFP_MSG_ACCURATE_SEEK_COMPLETE, seek_complete_pos);
                                 }
 
@@ -3245,6 +3251,43 @@ static int read_thread(void *arg)
                 if (first_h264_stream < 0)
                     first_h264_stream = i;
             }
+
+            int64_t video_duration = 0;
+            if (st->nb_index_entries > 0) {
+                AVIndexEntry entry = st->index_entries[st->nb_index_entries - 1];
+                video_duration = av_rescale_q(entry.timestamp, st->time_base, AV_TIME_BASE_Q) / 1000;
+                int key_frame_num = 0;
+                for (int i = 0; i < st->nb_index_entries; i++) {
+                    entry = st->index_entries[i];
+                    if (entry.flags & AVINDEX_KEYFRAME) {
+                        int64_t pos = av_rescale_q(entry.timestamp, st->time_base, AV_TIME_BASE_Q) / 1000;
+                        key_frame_num++;
+                    }
+                }
+                if (key_frame_num > 0) {
+                    ffp->key_frame_num = key_frame_num;
+                    ffp->key_frames = (int64_t *) av_mallocz(sizeof(int64_t) * key_frame_num);
+                    int64_t first_key_frame_pos = INT64_MIN;
+                    int key_frame_index = 0;
+                    int64_t key_frames[key_frame_num];
+                    for (int i = 0; i < st->nb_index_entries; i++) {
+                        entry = st->index_entries[i];
+                        if (entry.flags & AVINDEX_KEYFRAME) {
+                            int64_t pos = av_rescale_q(entry.timestamp, st->time_base, AV_TIME_BASE_Q) / 1000;
+                            if (first_key_frame_pos == INT64_MIN) {
+                                first_key_frame_pos = pos;
+                                key_frames[key_frame_index++] = 0;
+                            } else {
+                                key_frames[key_frame_index++] = pos - first_key_frame_pos;
+                            }
+                        }
+                    }
+                    memcpy(ffp->key_frames, key_frames, sizeof(int64_t) * key_frame_num);
+                }
+            } else {
+                video_duration = av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q) / 1000;
+            }
+            ffp->video_duration = video_duration;
         }
     }
     if (video_stream_count > 1 && st_index[AVMEDIA_TYPE_VIDEO] < 0) {
@@ -3327,18 +3370,6 @@ static int read_thread(void *arg)
         is->buffer_indicator_queue = &is->videoq;
     } else {
         assert("invalid streams");
-    }
-    if (is->video_stream >= 0) {
-        AVIndexEntry *entries = ic->streams[is->video_stream]->index_entries;
-        int entry_size = ic->streams[is->video_stream]->nb_index_entries;
-        int key_count = 0;
-        for (int i = 0; i < entry_size; i++) {
-            AVIndexEntry entry = entries[i];
-            if (entry.flags & AV_PKT_FLAG_KEY) {
-                key_count++;
-                int64_t key_timestamp = av_rescale_q(entry.timestamp, ic->streams[is->video_stream]->time_base, AV_TIME_BASE_Q) / 1000;
-            }
-        }
     }
 
     if (ffp->infinite_buffer < 0 && is->realtime)
@@ -3450,6 +3481,33 @@ static int read_thread(void *arg)
             if (is->pause_req)
                 step_to_next_frame_l(ffp);
             SDL_UnlockMutex(ffp->is->play_mutex);
+
+            is->seek_gop_start = -1;
+            is->seek_gop_end = -1;
+            int key_frame_num = ffp->key_frame_num;
+            if (key_frame_num > 0) {
+                int64_t seek_gop_start = -1;
+                int64_t seek_gop_end = -1;
+                int64_t seek_pos = seek_target / 1000;
+                for (int i = 0; i < key_frame_num - 1; i++) {
+                    int64_t i1 = *(ffp->key_frames + i);
+                    if (i + 1 >= key_frame_num) {
+                        break;
+                    }
+                    int64_t i2 = *(ffp->key_frames + (i + 1));
+                    if (i1 <= seek_pos && seek_pos < i2) {
+                        seek_gop_start = i1;
+                        seek_gop_end = i2;
+                        break;
+                    }
+                }
+                if (seek_gop_start == -1 && seek_gop_end == -1) {
+                    seek_gop_start = *(ffp->key_frames + key_frame_num - 1);
+                    seek_gop_end = ffp->video_duration;
+                }
+                is->seek_gop_start = seek_gop_start;
+                is->seek_gop_end = seek_gop_end;
+            }
 
             if (ffp->enable_accurate_seek) {
                 is->drop_aframe_count = 0;
@@ -3613,36 +3671,42 @@ static int read_thread(void *arg)
             packet_queue_put(&is->audioq, pkt);
         } else if (pkt->stream_index == is->video_stream && pkt_in_play_range
                    && !(is->video_st && (is->video_st->disposition & AV_DISPOSITION_ATTACHED_PIC))) {
-            if (is->video_accurate_seek_req) {
-                if (is->video_st->codecpar->codec_id == AV_CODEC_ID_H264) {
+            if (is->video_accurate_seek_req || is->audio_accurate_seek_req) {
+                int64_t pkt_time = av_rescale_q(pkt->pts, is->video_st->time_base, AV_TIME_BASE_Q) / 1000;
+                int64_t seek_gop_start = is->seek_gop_start;
+                int64_t seek_gop_end = is->seek_gop_end;
+                int64_t seek_pos = (int64_t) (is->seek_pos / 1000);
+                if (seek_gop_start <= pkt_time && pkt_time < seek_gop_end) {
                     is->seek_frame_nums++;
-                    uint8_t nal_ref_idc = (pkt->data[4] >> 5) & 0x03;
-                    int64_t pkt_time = av_rescale_q(pkt->pts, is->video_st->time_base, AV_TIME_BASE_Q) / 1000;
-                    if (nal_ref_idc == 0) {
-                        /// seek点附近的帧不能丢弃
-                        if (abs(pkt_time - is->seek_pos / 1000) < 100) {
-                            packet_queue_put(&is->videoq, pkt);
+                    if (is->video_st->codecpar->codec_id == AV_CODEC_ID_H264) {
+                        uint8_t nal_ref_idc = (pkt->data[4] >> 5) & 0x03;
+                        if (nal_ref_idc == 0) {
+                            /// seek点附近的帧不能丢弃
+                            if (pkt_time < seek_pos - 50) {
+                                is->seek_non_ref_frame_nums++;
+                                av_packet_unref(pkt);
+                            } else {
+                                packet_queue_put(&is->videoq, pkt);
+                            }
                         } else {
-                            is->seek_non_ref_frame_nums++;
-                            av_packet_unref(pkt);
+                            packet_queue_put(&is->videoq, pkt);
                         }
-                    } else {
-                        packet_queue_put(&is->videoq, pkt);
-                    }
-                } else if (is->video_st->codecpar->codec_id == AV_CODEC_ID_H265) {
-                    uint8_t nal_unit_type = (pkt->data[4] & 0x7e) >> 1;
-                    int64_t pkt_time = av_rescale_q(pkt->pts, is->video_st->time_base, AV_TIME_BASE_Q) / 1000;
-                    if (nal_unit_type == HEVC_NAL_TRAIL_N ||
-                        nal_unit_type == HEVC_NAL_TSA_N ||
-                        nal_unit_type == HEVC_NAL_STSA_N ||
-                        nal_unit_type == HEVC_NAL_RADL_N ||
-                        nal_unit_type == HEVC_NAL_RASL_N) {
-                        /// seek点附近的帧不能丢弃
-                        if (abs(pkt_time - is->seek_pos / 1000) < 100) {
-                            packet_queue_put(&is->videoq, pkt);
+                    } else if (is->video_st->codecpar->codec_id == AV_CODEC_ID_H265) {
+                        uint8_t nal_unit_type = (pkt->data[4] & 0x7e) >> 1;
+                        if (nal_unit_type == HEVC_NAL_TRAIL_N ||
+                            nal_unit_type == HEVC_NAL_TSA_N ||
+                            nal_unit_type == HEVC_NAL_STSA_N ||
+                            nal_unit_type == HEVC_NAL_RADL_N ||
+                            nal_unit_type == HEVC_NAL_RASL_N) {
+                            /// seek点附近的帧不能丢弃
+                            if (pkt_time < seek_pos - 50) {
+                                is->seek_non_ref_frame_nums++;
+                                av_packet_unref(pkt);
+                            } else {
+                                packet_queue_put(&is->videoq, pkt);
+                            }
                         } else {
-                            is->seek_non_ref_frame_nums++;
-                            av_packet_unref(pkt);
+                            packet_queue_put(&is->videoq, pkt);
                         }
                     } else {
                         packet_queue_put(&is->videoq, pkt);

@@ -421,6 +421,8 @@ typedef struct VideoState {
     int64_t seek_start_time;
     int seek_frame_nums;
     int seek_non_ref_frame_nums;
+    int64_t seek_gop_start;
+    int64_t seek_gop_end;
 } VideoState;
 
 /* options specified by the user */
@@ -723,6 +725,9 @@ typedef struct FFPlayer {
     char *mediacodec_default_name;
     int ijkmeta_delay_init;
     int render_wait_start;
+    int64_t video_duration;
+    int key_frame_num;
+    int64_t *key_frames;
 } FFPlayer;
 
 #define fftime_to_milliseconds(ts) (av_rescale(ts, 1000, AV_TIME_BASE))
