@@ -1591,7 +1591,6 @@ static int queue_picture(FFPlayer *ffp, AVFrame *src_frame, double pts, double d
                         SDL_UnlockMutex(is->accurate_seek_mutex);
                         return 1;
                     }
-
                     SDL_UnlockMutex(is->accurate_seek_mutex);
                 }
             }
@@ -3676,18 +3675,14 @@ static int read_thread(void *arg)
                 int64_t seek_gop_start = is->seek_gop_start;
                 int64_t seek_gop_end = is->seek_gop_end;
                 int64_t seek_pos = (int64_t) (is->seek_pos / 1000);
-                if (seek_gop_start <= pkt_time && pkt_time < seek_gop_end) {
+                if (pkt_time <= seek_pos + 50) {
                     is->seek_frame_nums++;
                     if (is->video_st->codecpar->codec_id == AV_CODEC_ID_H264) {
                         uint8_t nal_ref_idc = (pkt->data[4] >> 5) & 0x03;
                         if (nal_ref_idc == 0) {
                             /// seek点附近的帧不能丢弃
-                            if (pkt_time < seek_pos - 50) {
-                                is->seek_non_ref_frame_nums++;
-                                av_packet_unref(pkt);
-                            } else {
-                                packet_queue_put(&is->videoq, pkt);
-                            }
+                            is->seek_non_ref_frame_nums++;
+                            av_packet_unref(pkt);
                         } else {
                             packet_queue_put(&is->videoq, pkt);
                         }
@@ -3699,12 +3694,8 @@ static int read_thread(void *arg)
                             nal_unit_type == HEVC_NAL_RADL_N ||
                             nal_unit_type == HEVC_NAL_RASL_N) {
                             /// seek点附近的帧不能丢弃
-                            if (pkt_time < seek_pos - 50) {
-                                is->seek_non_ref_frame_nums++;
-                                av_packet_unref(pkt);
-                            } else {
-                                packet_queue_put(&is->videoq, pkt);
-                            }
+                            is->seek_non_ref_frame_nums++;
+                            av_packet_unref(pkt);
                         } else {
                             packet_queue_put(&is->videoq, pkt);
                         }
