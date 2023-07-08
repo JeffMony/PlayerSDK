@@ -64,6 +64,8 @@ jint J4AC_android_media_AudioTrack__getPlaybackRate(JNIEnv *env, jobject thiz);
 jint J4AC_android_media_AudioTrack__getPlaybackRate__catchAll(JNIEnv *env, jobject thiz);
 jint J4AC_android_media_AudioTrack__setPlaybackRate(JNIEnv *env, jobject thiz, jint sampleRateInHz);
 jint J4AC_android_media_AudioTrack__setPlaybackRate__catchAll(JNIEnv *env, jobject thiz, jint sampleRateInHz);
+jboolean J4AC_android_media_AudioTrack__getTimestamp(JNIEnv *env, jobject thiz, jobject audio_timestamp_jobject);
+jboolean J4AC_android_media_AudioTrack__getTimestamp__catchAll(JNIEnv *env, jobject thiz, jobject audio_timestamp_jobject);
 int J4A_loadClass__J4AC_android_media_AudioTrack(JNIEnv *env);
 
 #define J4A_HAVE_SIMPLE__J4AC_android_media_AudioTrack

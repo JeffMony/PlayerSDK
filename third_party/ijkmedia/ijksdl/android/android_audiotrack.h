@@ -109,4 +109,6 @@ int SDL_Android_AudioTrack_write(JNIEnv *env, SDL_Android_AudioTrack *atrack, ui
 int  SDL_Android_AudioTrack_getAudioSessionId(JNIEnv *env, SDL_Android_AudioTrack *atrack);
 void SDL_Android_AudioTrack_setSpeed(JNIEnv *env, SDL_Android_AudioTrack *atrack, float speed);
 
+int64_t SDL_Android_AudioTrack_getTimestamp(JNIEnv *env, SDL_Android_AudioTrack *atrack);
+
 #endif

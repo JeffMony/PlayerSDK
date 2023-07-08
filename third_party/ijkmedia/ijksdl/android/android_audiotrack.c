@@ -100,6 +100,8 @@ static int find_android_format(int sdl_format)
 
 typedef struct SDL_Android_AudioTrack {
     jobject thiz;
+    jobject audio_timestamp_jobject;
+    jfieldID audio_timestamp_frame_position_id;
 
     SDL_Android_AudioTrack_Spec spec;
 
@@ -225,6 +227,13 @@ SDL_Android_AudioTrack *SDL_Android_AudioTrack_new_from_spec(JNIEnv *env, SDL_An
         return NULL;
     }
 
+    jclass audio_timestamp_jclass = J4A_FindClass__catchAll(env, "android/media/AudioTimestamp");
+    jmethodID audio_timestamp_init_method = J4A_GetMethodID__catchAll(env, audio_timestamp_jclass, "<init>", "()V");
+    atrack->audio_timestamp_jobject = SDL_JNI_NewObjectAsGlobalRef(env, audio_timestamp_jclass, audio_timestamp_init_method);
+    atrack->audio_timestamp_frame_position_id = J4A_GetFieldID__catchAll(env, audio_timestamp_jclass, "framePosition", "J");
+
+    J4A_DeleteLocalRef(env, audio_timestamp_jclass);
+
     atrack->min_buffer_size = min_buffer_size;
     atrack->spec.buffer_size_in_bytes = min_buffer_size;
     // atrack->max_volume = J4AC_AudioTrack__getMaxVolume__catchAll(env);
@@ -263,6 +272,8 @@ void SDL_Android_AudioTrack_free(JNIEnv *env, SDL_Android_AudioTrack* atrack)
     if (atrack->thiz) {
         J4AC_AudioTrack__release(env, atrack->thiz);
         J4A_DeleteGlobalRef__p(env, &atrack->thiz);
+        J4A_DeleteGlobalRef__p(env, &atrack->audio_timestamp_jobject);
+//        J4A_DeleteGlobalRef__p(env, &atrack->audio_timestamp_jclass);
     }
 
     free(atrack);
@@ -365,4 +376,13 @@ void SDL_Android_AudioTrack_setSpeed(JNIEnv *env, SDL_Android_AudioTrack *atrack
         return;
 
     return;
+}
+
+int64_t SDL_Android_AudioTrack_getTimestamp(JNIEnv *env, SDL_Android_AudioTrack *atrack) {
+    jboolean ret = J4AC_android_media_AudioTrack__getTimestamp(env, atrack->thiz, atrack->audio_timestamp_jobject);
+    if (!ret) {
+        return -1;
+    }
+    jlong frame_position = (*env)->GetLongField(env, atrack->audio_timestamp_jobject, atrack->audio_timestamp_frame_position_id);
+    return (int64_t) frame_position;
 }

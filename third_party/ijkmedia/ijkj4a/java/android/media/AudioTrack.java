@@ -31,4 +31,5 @@ public class AudioTrack {
     int getSampleRate();
     int getPlaybackRate();
     int setPlaybackRate(int sampleRateInHz);
+    boolean getTimestamp(AudioTimestamp timestamp);
 }

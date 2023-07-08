@@ -43,6 +43,7 @@ typedef struct J4AC_android_media_AudioTrack {
     jmethodID method_getSampleRate;
     jmethodID method_getPlaybackRate;
     jmethodID method_setPlaybackRate;
+    jmethodID method_getTimestamp;
 } J4AC_android_media_AudioTrack;
 static J4AC_android_media_AudioTrack class_J4AC_android_media_AudioTrack;
 
@@ -347,6 +348,18 @@ jint J4AC_android_media_AudioTrack__setPlaybackRate__catchAll(JNIEnv *env, jobje
     return ret_value;
 }
 
+jboolean J4AC_android_media_AudioTrack__getTimestamp(JNIEnv *env, jobject thiz, jobject audio_timestamp_jobject) {
+    return (*env)->CallBooleanMethod(env, thiz, class_J4AC_android_media_AudioTrack.method_getTimestamp, audio_timestamp_jobject);
+}
+
+jboolean J4AC_android_media_AudioTrack__getTimestamp__catchAll(JNIEnv *env, jobject thiz, jobject audio_timestamp_jobject) {
+    jboolean ret_value = J4AC_android_media_AudioTrack__getTimestamp(env, thiz, audio_timestamp_jobject);
+    if (J4A_ExceptionCheck__catchAll(env)) {
+        return false;
+    }
+    return ret_value;
+}
+
 int J4A_loadClass__J4AC_android_media_AudioTrack(JNIEnv *env)
 {
     int         ret                   = -1;
@@ -498,6 +511,13 @@ int J4A_loadClass__J4AC_android_media_AudioTrack(JNIEnv *env)
     sign     = "(I)I";
     class_J4AC_android_media_AudioTrack.method_setPlaybackRate = J4A_GetMethodID__catchAll(env, class_id, name, sign);
     if (class_J4AC_android_media_AudioTrack.method_setPlaybackRate == NULL)
+        goto fail;
+
+    class_id = class_J4AC_android_media_AudioTrack.id;
+    name     = "getTimestamp";
+    sign     = "(Landroid/media/AudioTimestamp;)Z";
+    class_J4AC_android_media_AudioTrack.method_getTimestamp = J4A_GetMethodID__catchAll(env, class_id, name, sign);
+    if (class_J4AC_android_media_AudioTrack.method_getTimestamp == NULL)
         goto fail;
 
     J4A_ALOGD("J4ALoader: OK: '%s' loaded\n", "android.media.AudioTrack");

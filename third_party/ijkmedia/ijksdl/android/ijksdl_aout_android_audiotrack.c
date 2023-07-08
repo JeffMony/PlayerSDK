@@ -101,6 +101,7 @@ static int aout_thread_n(JNIEnv *env, SDL_Aout *aout)
                 SDL_Android_AudioTrack_play(env, atrack);
             }
         }
+        int64_t frame_position = SDL_Android_AudioTrack_getTimestamp(env, atrack);
         if (opaque->need_flush) {
             opaque->need_flush = 0;
             SDL_Android_AudioTrack_flush(env, atrack);
