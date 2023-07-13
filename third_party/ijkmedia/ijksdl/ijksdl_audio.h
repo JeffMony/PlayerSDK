@@ -74,8 +74,11 @@ typedef uint16_t SDL_AudioFormat;
 
 #define SDL_MIX_MAXVOLUME (128)
 
-typedef void (*SDL_AudioCallback) (void *userdata, Uint8 * stream,
-                                   int len);
+typedef void (*SDL_AudioCallback) (void *userdata,
+                                   Uint8 * stream,
+                                   int len,
+                                   int32_t audio_render_time,
+                                   int32_t *adjusted_time);
 
 typedef struct SDL_AudioSpec
 {

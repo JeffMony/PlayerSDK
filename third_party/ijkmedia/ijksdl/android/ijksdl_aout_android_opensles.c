@@ -130,7 +130,7 @@ static int aout_thread_n(SDL_Aout *aout)
 
     SDL_SetThreadPriority(SDL_THREAD_PRIORITY_HIGH);
     int32_t last_audio_position = 0;
-    int32_t opensl_render_audio_time = 0;
+    int32_t audio_render_time = 0;
 
     if (!opaque->abort_request && !opaque->pause_on)
         (*slPlayItf)->SetPlayState(slPlayItf, SL_PLAYSTATE_PLAYING);
@@ -166,7 +166,7 @@ static int aout_thread_n(SDL_Aout *aout)
                 (*slPlayItf)->GetDuration(slPlayItf, &audio_duration);
                 if (audio_position > 0) {
                     if (audio_position > last_audio_position) {
-                        opensl_render_audio_time += (audio_position - last_audio_position);
+                        audio_render_time += (audio_position - last_audio_position);
                     }
                 } else {
                     audio_position = 0;
@@ -201,7 +201,9 @@ static int aout_thread_n(SDL_Aout *aout)
 
         next_buffer = opaque->buffer + next_buffer_index * bytes_per_buffer;
         next_buffer_index = (next_buffer_index + 1) % OPENSLES_BUFFERS;
-        audio_cblk(userdata, next_buffer, bytes_per_buffer);
+        int32_t adjusted_time = audio_render_time;
+        audio_cblk(userdata, next_buffer, bytes_per_buffer, audio_render_time, &adjusted_time);
+        audio_render_time = adjusted_time;
         if (opaque->need_flush) {
             (*slBufferQueueItf)->Clear(slBufferQueueItf);
             opaque->need_flush = false;

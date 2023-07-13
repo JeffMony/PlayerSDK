@@ -81,6 +81,7 @@ static int aout_thread_n(JNIEnv *env, SDL_Aout *aout)
     assert(atrack);
     assert(buffer);
 
+    int32_t audio_render_time = 0;
     SDL_SetThreadPriority(SDL_THREAD_PRIORITY_HIGH);
 
     if (!opaque->abort_request && !opaque->pause_on)
@@ -116,7 +117,9 @@ static int aout_thread_n(JNIEnv *env, SDL_Aout *aout)
         }
         SDL_UnlockMutex(opaque->wakeup_mutex);
 
-        audio_cblk(userdata, buffer, copy_size);
+        int32_t adjusted_time = audio_render_time;
+        audio_cblk(userdata, buffer, copy_size, audio_render_time, &adjusted_time);
+        audio_render_time = adjusted_time;
         if (opaque->need_flush) {
             SDL_Android_AudioTrack_flush(env, atrack);
             opaque->need_flush = false;

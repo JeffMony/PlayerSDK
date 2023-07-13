@@ -423,6 +423,9 @@ typedef struct VideoState {
     int seek_non_ref_frame_nums;
     int64_t seek_gop_start;
     int64_t seek_gop_end;
+    int audio_seek_req;
+    int seek_completed;
+    int seek_completed_pos;
 } VideoState;
 
 /* options specified by the user */

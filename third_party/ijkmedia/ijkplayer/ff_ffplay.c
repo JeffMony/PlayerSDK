@@ -1183,6 +1183,9 @@ static void stream_seek(VideoState *is, int64_t pos, int64_t rel, int seek_by_by
         if (seek_by_bytes)
             is->seek_flags |= AVSEEK_FLAG_BYTE;
         is->seek_req = 1;
+        is->audio_seek_req = 1;
+        is->seek_completed = 0;
+        is->seek_completed_pos = 0;
         is->seek_start_time = av_gettime_relative();
         is->seek_frame_nums = 0;
         is->seek_non_ref_frame_nums = 0;
@@ -1585,6 +1588,9 @@ static int queue_picture(FFPlayer *ffp, AVFrame *src_frame, double pts, double d
                         ALOGI("video FFP_MSG_ACCURATE_SEEK_COMPLETE cost_time=%d", cost_time);
                         ALOGI("video FFP_MSG_ACCURATE_SEEK_COMPLETE frame_nums=%d, non_frame_nums=%d, seek_pos=%lld", is->seek_frame_nums, is->seek_non_ref_frame_nums, (int64_t)(is->seek_pos / 1000));
                         ffp_notify_msg2(ffp, FFP_MSG_ACCURATE_SEEK_COMPLETE, seek_complete_pos);
+
+                        is->seek_completed = 1;
+                        is->seek_completed_pos = seek_complete_pos;
                     }
                     if (video_seek_pos != is->seek_pos && !is->abort_request) {
                         is->video_accurate_seek_req = 1;
@@ -2077,6 +2083,8 @@ static int audio_thread(void *arg)
                                     ALOGI("audio FFP_MSG_ACCURATE_SEEK_COMPLETE cost_time=%d", cost_time);
                                     ALOGI("audio FFP_MSG_ACCURATE_SEEK_COMPLETE frame_nums=%d, non_frame_nums=%d, seek_pos=%lld", is->seek_frame_nums, is->seek_non_ref_frame_nums, (int64_t)(is->seek_pos / 1000));
                                     ffp_notify_msg2(ffp, FFP_MSG_ACCURATE_SEEK_COMPLETE, seek_complete_pos);
+                                    is->seek_completed = 1;
+                                    is->seek_completed_pos = seek_complete_pos;
                                 }
 
                                 if (audio_seek_pos != is->seek_pos && !is->abort_request) {
@@ -2645,7 +2653,7 @@ reload:
 }
 
 /* prepare a new audio buffer */
-static void sdl_audio_callback(void *opaque, Uint8 *stream, int len)
+static void sdl_audio_callback(void *opaque, Uint8 *stream, int len, int32_t audio_render_time, int32_t *adjust_time)
 {
     FFPlayer *ffp = opaque;
     VideoState *is = ffp->is;
@@ -2711,7 +2719,18 @@ static void sdl_audio_callback(void *opaque, Uint8 *stream, int len)
     is->audio_write_buf_size = is->audio_buf_size - is->audio_buf_index;
     /* Let's assume the audio driver that is used by SDL has two periods. */
     if (!isnan(is->audio_clock)) {
-        set_clock_at(&is->audclk, is->audio_clock - (double)(is->audio_write_buf_size) / is->audio_tgt.bytes_per_sec - SDL_AoutGetLatencySeconds(ffp->aout), is->audio_clock_serial, ffp->audio_callback_time / 1000000.0);
+        double sync_audio_clock = is->audio_clock;
+        if (is->audio_seek_req && is->seek_completed) {
+            audio_render_time = is->seek_completed_pos;
+            *adjust_time = audio_render_time;
+            is->audio_seek_req = 0;
+            is->seek_completed = 0;
+            is->seek_completed_pos = 0;
+        }
+        if (audio_render_time > 0) {
+            sync_audio_clock = audio_render_time * 1.0 / 1000;
+        }
+        set_clock_at(&is->audclk, sync_audio_clock - (double)(is->audio_write_buf_size) / is->audio_tgt.bytes_per_sec - SDL_AoutGetLatencySeconds(ffp->aout), is->audio_clock_serial, ffp->audio_callback_time / 1000000.0);
         sync_clock_to_slave(&is->extclk, &is->audclk);
     }
     if (!ffp->first_audio_frame_rendered) {
