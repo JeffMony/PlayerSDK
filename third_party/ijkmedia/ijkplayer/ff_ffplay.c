@@ -904,6 +904,7 @@ static void video_image_display2(FFPlayer *ffp)
             if (!ffp->first_video_frame_rendered) {
                 ffp->first_video_frame_rendered = 1;
                 ffp_notify_msg1(ffp, FFP_MSG_VIDEO_RENDERING_START);
+                is->audio_start_reset = 1;
             }
             while (is->pause_req && !is->abort_request) {
                 SDL_Delay(20);
@@ -914,6 +915,7 @@ static void video_image_display2(FFPlayer *ffp)
         if (!ffp->first_video_frame_rendered) {
             ffp->first_video_frame_rendered = 1;
             ffp_notify_msg1(ffp, FFP_MSG_VIDEO_RENDERING_START);
+            is->audio_start_reset = 1;
         }
 
         if (is->latest_video_seek_load_serial == vp->serial) {
@@ -2720,6 +2722,11 @@ static void sdl_audio_callback(void *opaque, Uint8 *stream, int len, int32_t aud
     /* Let's assume the audio driver that is used by SDL has two periods. */
     if (!isnan(is->audio_clock)) {
         double sync_audio_clock = is->audio_clock;
+        if (is->audio_start_reset) {
+            audio_render_time = 0;
+            *adjust_time = 0;
+            is->audio_start_reset = 0;
+        }
         if (is->audio_seek_req && is->seek_completed) {
             audio_render_time = is->seek_completed_pos;
             *adjust_time = audio_render_time;

@@ -426,6 +426,7 @@ typedef struct VideoState {
     int audio_seek_req;
     int seek_completed;
     int seek_completed_pos;
+    int audio_start_reset;
 } VideoState;
 
 /* options specified by the user */
