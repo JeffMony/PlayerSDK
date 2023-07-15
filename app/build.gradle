@@ -28,13 +28,13 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.aar'])
-
     implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.github.JeffMony:ORCodeDemo:v1.5.0'
     implementation 'pub.devrel:easypermissions:2.0.1'
     implementation 'com.github.JeffMony:Laker:1.0.6'
+    implementation 'com.iqiyi.xcrash:xcrash-android-lib:3.0.0'
     implementation project(path: ':playersdk')
     implementation project(path: ':exoplayer')
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 }

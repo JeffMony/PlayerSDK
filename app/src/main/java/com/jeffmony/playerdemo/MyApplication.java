@@ -7,11 +7,14 @@ import com.jeffmony.playersdk.manager.IPlayerInstanceListener;
 import com.jeffmony.playersdk.manager.PlayerConfig;
 import com.jeffmony.playersdk.manager.PlayerManager;
 
+import xcrash.XCrash;
+
 public class MyApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
+        XCrash.init(this);
         PlayerConfig config = new PlayerManager.Builder().setLimitCount(6).buildConfig();
         PlayerManager.getInstance().initConfig(config);
         PlayerManager.getInstance().addGlobalPlayerInstanceListener(mListener);
