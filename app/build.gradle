@@ -34,7 +34,7 @@ dependencies {
     implementation 'com.github.JeffMony:ORCodeDemo:v1.5.0'
     implementation 'pub.devrel:easypermissions:2.0.1'
     implementation 'com.github.JeffMony:Laker:1.0.6'
-    implementation 'com.iqiyi.xcrash:xcrash-android-lib:3.0.0'
+    implementation project(path: ':xcrash')
     implementation project(path: ':playersdk')
     implementation project(path: ':exoplayer')
 }

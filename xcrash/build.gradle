@@ -2,6 +2,10 @@ plugins {
     id 'com.android.library'
 }
 
+ext {
+    compile_with_asan = false
+}
+
 android {
     namespace 'com.example.xcrash'
     compileSdk 30
@@ -12,6 +16,10 @@ android {
 
         externalNativeBuild {
             cmake {
+                if (compile_with_asan) {
+                    arguments "-DANDROID_ARM_MODE=arm"
+                    arguments "-DUSEASAN=ON"
+                }
                 abiFilters "armeabi-v7a", "arm64-v8a"
             }
         }
