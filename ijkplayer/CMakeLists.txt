@@ -6,7 +6,11 @@ set(-DCMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -s -Wdeprecated-
 
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--exclude-libs,ALL -O3 -flto -Wl,--gc-sections")
 
-set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../third_party)
+if (${USE_IJKPLAYER_SOURCE} STREQUAL "true")
+    set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../../ijkplayer)
+else()
+    set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../third_party)
+endif()
 
 add_definitions("
 -DLIBYUV_NEON
@@ -24,7 +28,11 @@ set(IJKSDL_DIR ${EXTRA_DIR}/ijkmedia/ijksdl)
 
 set(IJKPLAYER_DIR ${EXTRA_DIR}/ijkmedia/ijkplayer)
 
-set(FFMPEG_DIR ${EXTRA_DIR}/ffmpeg)
+if (${USE_IJKPLAYER_SOURCE} STREQUAL "true")
+    set(FFMPEG_DIR ${EXTRA_DIR}/extra/ffmpeg)
+else()
+    set(FFMPEG_DIR ${EXTRA_DIR}/ffmpeg)
+endif()
 
 include_directories(${FFMPEG_DIR}/${ANDROID_ABI}/include)
 
