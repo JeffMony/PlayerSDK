@@ -1,9 +1,5 @@
 apply plugin: 'com.android.library'
 
-ext {
-    use_ijkplayer_source = true
-}
-
 android {
     compileSdk 30
 
@@ -15,7 +11,7 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments "-DUSE_ASAN=${use_asan}"
+                arguments "-DUSE_ASAN=${use_asan}",
                           "-DUSE_IJKPLAYER_SOURCE=${use_ijkplayer_source}"
                 cppFlags "-fvisibility=hidden -fvisibility-inlines-hidden", "-ffunction-sections -fdata-sections"
                 cFlags "-std=c99", "-fvisibility=hidden -fvisibility-inlines-hidden", "-ffunction-sections -fdata-sections"

@@ -6,7 +6,7 @@ set(-DCMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -s -Wdeprecated-
 
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--exclude-libs,ALL -O3 -flto -Wl,--gc-sections")
 
-if (${USE_IJKPLAYER_SOURCE} STREQUAL "true")
+if (USE_IJKPLAYER_SOURCE STREQUAL "true")
     set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../../ijkplayer)
 else()
     set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../third_party)
@@ -18,6 +18,12 @@ add_definitions("
 -DNDEBUG
 ")
 
+if (USE_IJKPLAYER_SOURCE STREQUAL "true")
+    add_definitions("
+            -DUSE_IJKPLAYER_SOURCE
+    ")
+endif()
+
 set(LIBYUV_DIR ${EXTRA_DIR}/ijkmedia/ijkyuv)
 
 set(IJKSOUNDTOUCH_DIR ${EXTRA_DIR}/ijkmedia/ijksoundtouch)
@@ -28,13 +34,13 @@ set(IJKSDL_DIR ${EXTRA_DIR}/ijkmedia/ijksdl)
 
 set(IJKPLAYER_DIR ${EXTRA_DIR}/ijkmedia/ijkplayer)
 
-if (${USE_IJKPLAYER_SOURCE} STREQUAL "true")
+if (USE_IJKPLAYER_SOURCE STREQUAL "true")
     set(FFMPEG_DIR ${EXTRA_DIR}/extra/ffmpeg)
+    include_directories(${EXTRA_DIR}/packages/libs/${ANDROID_ABI}/include)
 else()
     set(FFMPEG_DIR ${EXTRA_DIR}/ffmpeg)
+    include_directories(${FFMPEG_DIR}/${ANDROID_ABI}/include)
 endif()
-
-include_directories(${FFMPEG_DIR}/${ANDROID_ABI}/include)
 
 include_directories(${EXTRA_DIR}/ijkmedia)
 
@@ -245,7 +251,12 @@ else()
 endif()
 
 add_library(libijkffmpeg SHARED IMPORTED)
-set_target_properties(libijkffmpeg PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/ffmpeg/${ANDROID_ABI}/libijkffmpeg.so)
+
+if (USE_IJKPLAYER_SOURCE STREQUAL "true")
+    set_target_properties(libijkffmpeg PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/packages/libs/${ANDROID_ABI}/libijkffmpeg.so)
+else()
+    set_target_properties(libijkffmpeg PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/ffmpeg/${ANDROID_ABI}/libijkffmpeg.so)
+endif()
 
 add_library(
         jm_player
