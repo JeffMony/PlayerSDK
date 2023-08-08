@@ -37,4 +37,5 @@ dependencies {
     implementation project(path: ':xcrash')
     implementation project(path: ':playersdk')
     implementation project(path: ':exoplayer')
+    implementation project(path: ':media_cache')
 }

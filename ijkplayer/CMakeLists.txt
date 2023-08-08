@@ -7,7 +7,7 @@ set(-DCMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -s -Wdeprecated-
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--exclude-libs,ALL -O3 -flto -Wl,--gc-sections")
 
 if (USE_IJKPLAYER_SOURCE STREQUAL "true")
-    set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../../ijkplayer)
+    set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../../ijkplayer-av1)
 else()
     set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../third_party)
 endif()
