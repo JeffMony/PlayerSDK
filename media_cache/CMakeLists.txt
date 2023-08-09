@@ -56,9 +56,10 @@ include_directories(${MEDIACACHE_SOURCE_DIR})
 file(
         GLOB
         mediacache_source
+        ${MEDIACACHE_SOURCE_DIR}/local_proxy_server.cc
         ${MEDIACACHE_SOURCE_DIR}/proxy_cache_manager.cc
         ${MEDIACACHE_SOURCE_DIR}/media_env.c
-        ${MEDIACACHE_SOURCE_DIR}/media_jni.cc
+        ${MEDIACACHE_SOURCE_DIR}/mediacache_jni.cc
 )
 
 include_directories(${THIRD_PARTY_DIR}/openssl/${ANDROID_ABI}/include)
@@ -70,14 +71,14 @@ add_library(libssl STATIC IMPORTED)
 set_target_properties(libssl PROPERTIES IMPORTED_LOCATION ${THIRD_PARTY_DIR}/openssl/${ANDROID_ABI}/lib/libssl.a)
 
 add_library(
-        du_mediacache
+        mediacache
         SHARED
         ${libevent_source}
         ${mediacache_source}
 )
 
 target_link_libraries(
-        du_mediacache
+        mediacache
         android
         log
         z

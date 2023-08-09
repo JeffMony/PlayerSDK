@@ -6,10 +6,13 @@ public class ProxyCacheManager {
 
     private static volatile ProxyCacheManager sProxyCacheManager = null;
 
+    private static volatile boolean sLoadLibrary = false;
+
     public static ProxyCacheManager getInstance() {
         if (sProxyCacheManager == null) {
             synchronized (ProxyCacheManager.class) {
                 if (sProxyCacheManager == null) {
+                    loadLibrary();
                     sProxyCacheManager = new ProxyCacheManager();
                 }
             }
@@ -19,6 +22,15 @@ public class ProxyCacheManager {
 
     private ProxyCacheManager() {
         mHandler = createHandler();
+    }
+
+    private static void loadLibrary() {
+        if (sLoadLibrary) {
+            return;
+        }
+        System.loadLibrary("c++_shared");
+        System.loadLibrary("mediacache");
+        sLoadLibrary = true;
     }
 
     public String getProxyUrl(String url) {
