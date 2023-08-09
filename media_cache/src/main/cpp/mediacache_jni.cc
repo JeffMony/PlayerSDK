@@ -25,6 +25,11 @@ static jlong PROXY_CACHE_MANAGER_CREATE(JNIEnv *env, jobject object) {
     return reinterpret_cast<jlong>(proxy_cache_manager);
 }
 
+static void PROXY_CACHE_MANAGER_START(JNIEnv *env, jobject object, jlong id) {
+    auto proxy_cache_manager = reinterpret_cast<cache::ProxyCacheManager *>(id);
+    proxy_cache_manager->Start();
+}
+
 static jstring PROXY_CACHE_MANAGER_GET_PROXY_URL(JNIEnv *env, jobject object, jlong id, jstring j_url) {
     auto proxy_cache_manager = reinterpret_cast<cache::ProxyCacheManager *>(id);
     auto url = env->GetStringUTFChars(j_url, JNI_FALSE);
@@ -36,6 +41,7 @@ static jstring PROXY_CACHE_MANAGER_GET_PROXY_URL(JNIEnv *env, jobject object, jl
 
 static JNINativeMethod proxyCacheManagerMethods[] = {
     { "createHandler", "()J", (void **) PROXY_CACHE_MANAGER_CREATE },
+    { "start", "(J)V", (void **) PROXY_CACHE_MANAGER_START },
     { "getProxyUrl", "(JLjava/lang/String;)Ljava/lang/String;", (void **) PROXY_CACHE_MANAGER_GET_PROXY_URL },
 };
 

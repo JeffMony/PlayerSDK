@@ -17,6 +17,8 @@ public:
 
     virtual ~ProxyCacheManager();
 
+    void Start();
+
     std::string GetProxyUrl(const char* url);
 
 private:

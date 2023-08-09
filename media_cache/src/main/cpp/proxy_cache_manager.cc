@@ -16,6 +16,10 @@ ProxyCacheManager::~ProxyCacheManager() {
     delete local_proxy_server_;
 }
 
+void ProxyCacheManager::Start() {
+    local_proxy_server_->Start();
+}
+
 std::string ProxyCacheManager::GetProxyUrl(const char *url) {
     std::string result;
     result.append("http://127.0.0.1");

@@ -33,10 +33,15 @@ public class ProxyCacheManager {
         sLoadLibrary = true;
     }
 
+    public void start() {
+        start(mHandler);
+    }
+
     public String getProxyUrl(String url) {
         return getProxyUrl(mHandler, url);
     }
 
     private native long createHandler();
+    private native void start(long handler);
     private native String getProxyUrl(long handler, String url);
 }
