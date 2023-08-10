@@ -1,9 +1,9 @@
 //
-// Created by jefflee on 2023/8/8.
+// Created by jeffli on 2023/8/8.
 //
 
-#ifndef PLAYERSDK_MEDIA_CACHE_SRC_MAIN_CPP_PROXY_CACHE_MANAGER_H_
-#define PLAYERSDK_MEDIA_CACHE_SRC_MAIN_CPP_PROXY_CACHE_MANAGER_H_
+#ifndef ANDROIDMEDIACACHE_LIBRARY_SRC_MAIN_CPP_PROXY_CACHE_MANAGER_H_
+#define ANDROIDMEDIACACHE_LIBRARY_SRC_MAIN_CPP_PROXY_CACHE_MANAGER_H_
 
 #include <jni.h>
 #include <string>
@@ -12,19 +12,19 @@
 namespace cache {
 
 class ProxyCacheManager {
-public:
-    ProxyCacheManager(jobject object);
+ public:
+  ProxyCacheManager(jobject object);
 
-    virtual ~ProxyCacheManager();
+  virtual ~ProxyCacheManager();
 
-    void Start();
+  void Start();
 
-    std::string GetProxyUrl(const char* url);
+  std::string GetProxyUrl(const char* url);
 
-private:
-    LocalProxyServer *local_proxy_server_;
+ private:
+  LocalProxyServer *local_proxy_server_;
 };
 
 }
 
-#endif //PLAYERSDK_MEDIA_CACHE_SRC_MAIN_CPP_PROXY_CACHE_MANAGER_H_
+#endif //ANDROIDMEDIACACHE_LIBRARY_SRC_MAIN_CPP_PROXY_CACHE_MANAGER_H_

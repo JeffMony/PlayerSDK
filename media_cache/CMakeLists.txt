@@ -52,12 +52,17 @@ file(
 )
 
 include_directories(${MEDIACACHE_SOURCE_DIR})
+include_directories(${MEDIACACHE_SOURCE_DIR}/base64)
 
 file(
         GLOB
         mediacache_source
+        ${MEDIACACHE_SOURCE_DIR}/base64/buffer.c
+        ${MEDIACACHE_SOURCE_DIR}/base64/decode.c
+        ${MEDIACACHE_SOURCE_DIR}/base64/encode.c
         ${MEDIACACHE_SOURCE_DIR}/local_proxy_server.cc
         ${MEDIACACHE_SOURCE_DIR}/proxy_cache_manager.cc
+        ${MEDIACACHE_SOURCE_DIR}/request_parser.cc
         ${MEDIACACHE_SOURCE_DIR}/media_env.c
         ${MEDIACACHE_SOURCE_DIR}/mediacache_jni.cc
 )
