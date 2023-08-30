@@ -3693,7 +3693,17 @@ static int read_thread(void *arg)
                 (double)(ffp->start_time != AV_NOPTS_VALUE ? ffp->start_time : 0) / 1000000
                 <= ((double)ffp->duration / 1000000);
         if (pkt->stream_index == is->audio_stream && pkt_in_play_range) {
-            packet_queue_put(&is->audioq, pkt);
+            if (is->video_accurate_seek_req || is->audio_accurate_seek_req) {
+              int64_t pkt_time = av_rescale_q(pkt->pts, is->audio_st->time_base, AV_TIME_BASE_Q) / 1000;
+              int64_t seek_pos = (int64_t) (is->seek_pos / 1000);
+              if (pkt_time <= seek_pos - 50) {
+                av_packet_unref(pkt);
+              } else {
+                packet_queue_put(&is->audioq, pkt);
+              }
+            } else {
+              packet_queue_put(&is->audioq, pkt);
+            }
         } else if (pkt->stream_index == is->video_stream && pkt_in_play_range
                    && !(is->video_st && (is->video_st->disposition & AV_DISPOSITION_ATTACHED_PIC))) {
             if (is->video_accurate_seek_req || is->audio_accurate_seek_req) {
@@ -3701,7 +3711,7 @@ static int read_thread(void *arg)
                 int64_t seek_gop_start = is->seek_gop_start;
                 int64_t seek_gop_end = is->seek_gop_end;
                 int64_t seek_pos = (int64_t) (is->seek_pos / 1000);
-                if (pkt_time <= seek_pos + 50) {
+                if (pkt_time <= seek_pos - 50) {
                     is->seek_frame_nums++;
                     if (is->video_st->codecpar->codec_id == AV_CODEC_ID_H264) {
                         uint8_t nal_ref_idc = (pkt->data[4] >> 5) & 0x03;
