@@ -8,10 +8,9 @@ set(-DCMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -s -Wdeprecated-
 
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--exclude-libs,ALL -O3 -flto -Wl,--gc-sections")
 
-set(LIBEVENT_DIR ${CMAKE_CURRENT_LIST_DIR}/source/libevent)
-set(MEDIACACHE_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src/main/cpp)
+set(MEDIACACHE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../MediaCache)
 
-set(THIRD_PARTY_DIR ${CMAKE_CURRENT_LIST_DIR}/source/output)
+set(LIBEVENT_DIR ${MEDIACACHE_DIR}/libevent)
 
 include_directories(${LIBEVENT_DIR})
 include_directories(${LIBEVENT_DIR}/include)
@@ -51,39 +50,51 @@ file(
         ${LIBEVENT_DIR}/strlcpy.c
 )
 
-include_directories(${MEDIACACHE_SOURCE_DIR})
-include_directories(${MEDIACACHE_SOURCE_DIR}/base64)
+include_directories(${MEDIACACHE_DIR}/source)
+include_directories(${MEDIACACHE_DIR}/source/base64)
+include_directories(${MEDIACACHE_DIR}/source/cache)
+include_directories(${MEDIACACHE_DIR}/source/common)
+include_directories(${MEDIACACHE_DIR}/source/network)
 
 file(
         GLOB
         mediacache_source
-        ${MEDIACACHE_SOURCE_DIR}/base64/buffer.c
-        ${MEDIACACHE_SOURCE_DIR}/base64/decode.c
-        ${MEDIACACHE_SOURCE_DIR}/base64/encode.c
-        ${MEDIACACHE_SOURCE_DIR}/local_proxy_server.cc
-        ${MEDIACACHE_SOURCE_DIR}/proxy_cache_manager.cc
-        ${MEDIACACHE_SOURCE_DIR}/request_parser.cc
-        ${MEDIACACHE_SOURCE_DIR}/media_env.c
-        ${MEDIACACHE_SOURCE_DIR}/mediacache_jni.cc
+        ${MEDIACACHE_DIR}/source/base64/buffer.c
+        ${MEDIACACHE_DIR}/source/base64/decode.c
+        ${MEDIACACHE_DIR}/source/base64/encode.c
+        ${MEDIACACHE_DIR}/source/network/url_connection.cc
+        ${MEDIACACHE_DIR}/source/proxy_server.cc
 )
 
-include_directories(${THIRD_PARTY_DIR}/openssl/${ANDROID_ABI}/include)
+include_directories(${MEDIACACHE_DIR}/android)
+include_directories(${MEDIACACHE_DIR}/android/jni)
+
+file(
+        GLOB
+        android_platform_source
+        ${MEDIACACHE_DIR}/android/jni/media_cache_env.c
+        ${MEDIACACHE_DIR}/android/media_cache_jni.cc
+        ${MEDIACACHE_DIR}/android/proxy_manager_android.cc
+)
+
+include_directories(${MEDIACACHE_DIR}/dist/android/openssl/${ANDROID_ABI}/include)
 
 add_library(libcrypto STATIC IMPORTED)
-set_target_properties(libcrypto PROPERTIES IMPORTED_LOCATION ${THIRD_PARTY_DIR}/openssl/${ANDROID_ABI}/lib/libcrypto.a)
+set_target_properties(libcrypto PROPERTIES IMPORTED_LOCATION ${MEDIACACHE_DIR}/dist/android/openssl/${ANDROID_ABI}/lib/libcrypto.a)
 
 add_library(libssl STATIC IMPORTED)
-set_target_properties(libssl PROPERTIES IMPORTED_LOCATION ${THIRD_PARTY_DIR}/openssl/${ANDROID_ABI}/lib/libssl.a)
+set_target_properties(libssl PROPERTIES IMPORTED_LOCATION ${MEDIACACHE_DIR}/dist/android/openssl/${ANDROID_ABI}/lib/libssl.a)
 
 add_library(
-        mediacache
+        media_cache
         SHARED
         ${libevent_source}
         ${mediacache_source}
+        ${android_platform_source}
 )
 
 target_link_libraries(
-        mediacache
+        media_cache
         android
         log
         z

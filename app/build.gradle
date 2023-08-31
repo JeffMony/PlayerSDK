@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+ext {
+    use_media_cache = true
+}
+
 android {
     compileSdk 30
 
@@ -10,6 +14,7 @@ android {
         versionCode 1
         versionName "1.0"
 
+        buildConfigField "boolean", "USE_MEDIA_CACHE", "${use_media_cache}"
     }
 
     buildTypes {
@@ -42,5 +47,7 @@ dependencies {
     implementation project(path: ':xcrash')
     implementation project(path: ':playersdk')
     implementation project(path: ':exoplayer')
-    implementation project(path: ':media_cache')
+    if (use_media_cache) {
+        implementation project(path: ':media_cache')
+    }
 }

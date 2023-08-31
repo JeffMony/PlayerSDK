@@ -17,9 +17,9 @@ android {
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_STL=c++_shared",
-                        "-DANDROID_API=21"
+                          "-DANDROID_API=21"
                 cppFlags "-fvisibility=hidden -fvisibility-inlines-hidden", "-ffunction-sections -fdata-sections"
-                cFlags "-ffunction-sections -fdata-sections"
+                cFlags   "-fvisibility=hidden -fvisibility-inlines-hidden", "-ffunction-sections -fdata-sections"
                 abiFilters "armeabi-v7a", "arm64-v8a"
             }
         }

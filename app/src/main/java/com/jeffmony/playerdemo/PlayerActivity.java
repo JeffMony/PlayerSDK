@@ -22,7 +22,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.jeffmony.mediacache.ProxyCacheManager;
 import com.jeffmony.playersdk.CommonPlayer;
 import com.jeffmony.playersdk.IPlayer;
 import com.jeffmony.playersdk.LogUtils;
@@ -242,10 +241,11 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             return;
         }
-        ProxyCacheManager.getInstance().start();
-        String proxyUrl = ProxyCacheManager.getInstance().getProxyUrl("http://sns-video-al.xhscdn.com/stream/110/1/01e4a98973e7cde50103730389364cb89b_1.mp4");
+        // ProxyCacheManager.getInstance().start();
+        // String proxyUrl = ProxyCacheManager.getInstance().getProxyUrl("http://sns-video-al.xhscdn.com/stream/110/1/01e4a98973e7cde50103730389364cb89b_1.mp4");
         try {
-            mPlayer.setDataSource(this, Uri.parse(proxyUrl));
+            // mPlayer.setDataSource(this, Uri.parse(proxyUrl));
+            mPlayer.setDataSource(this, Uri.parse(mUrl));
         } catch (Exception e) {
             Log.w(TAG, "setDataSource failed, exception = " + e.getMessage());
             return;

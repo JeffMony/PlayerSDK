@@ -66,9 +66,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // http://sns-video-bd.xhscdn.com/stream/110/258/01e4326d8b792647010370038764ff7d3c_258.mp4
         // http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8
         // http://sns-video-bd.xhscdn.com/stream/110/258/01e4326d8b792647010370038764ff7d3c_258.mp4
-        // mUrlText.setText("file:///storage/emulated/0/DCIM/Camera/long_gop.mp4");
+        mUrlText.setText("file:///storage/emulated/0/DCIM/Camera/long_gop.mp4");
         // mUrlText.setText("file:///storage/emulated/0/Pictures/VIDEO_20230713_231426.mp4");
-        mUrlText.setText("http://sns-video-bd.xhscdn.com/stream/110/258/01e4326d8b792647010370038764ff7d3c_258.mp4");
+        // mUrlText.setText("http://sns-video-bd.xhscdn.com/stream/110/258/01e4326d8b792647010370038764ff7d3c_258.mp4");
+        // mUrlText.setText("https://dytt1.120.tc/1635943103309135872_.m3u8?auth_key=8bc39ac55d625015090811f1d9d572b6&timestamp=64d5c195");
         mExoBtn.setOnClickListener(this);
         mIjkBtn.setOnClickListener(this);
         mOrcodeBtn.setOnClickListener(this);
