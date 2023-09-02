@@ -62,11 +62,11 @@ file(
         ${MEDIACACHE_DIR}/source/base64/buffer.c
         ${MEDIACACHE_DIR}/source/base64/decode.c
         ${MEDIACACHE_DIR}/source/base64/encode.c
-        ${MEDIACACHE_DIR}/source/cache/cache_utils.cc
+        ${MEDIACACHE_DIR}/source/common/proxy_settings.cc
         ${MEDIACACHE_DIR}/source/common/string_utils.cc
         ${MEDIACACHE_DIR}/source/network/request_parser.cc
         ${MEDIACACHE_DIR}/source/network/url_connection.cc
-        ${MEDIACACHE_DIR}/source/proxy_server.cc
+        ${MEDIACACHE_DIR}/source/proxy_manager.cc
 )
 
 include_directories(${MEDIACACHE_DIR}/android)

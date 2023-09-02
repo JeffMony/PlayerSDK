@@ -242,7 +242,6 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             return;
         }
-        ProxyManager.getInstance().start();
         String proxyUrl = ProxyManager.getInstance().getProxyUrl("http://sns-video-al.xhscdn.com/stream/110/1/01e4a98973e7cde50103730389364cb89b_1.mp4");
         try {
             mPlayer.setDataSource(this, Uri.parse(proxyUrl));
