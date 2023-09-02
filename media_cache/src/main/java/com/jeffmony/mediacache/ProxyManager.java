@@ -26,11 +26,16 @@ public class ProxyManager {
         start(mHandler);
     }
 
+    public void close() {
+        close(mHandler);
+    }
+
     public String getProxyUrl(String url) {
         return getProxyUrl(mHandler, url);
     }
 
     private native long createHandler();
     private native void start(long handler);
+    private native void close(long handler);
     private native String getProxyUrl(long handler, String url);
 }

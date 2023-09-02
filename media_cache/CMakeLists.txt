@@ -62,6 +62,9 @@ file(
         ${MEDIACACHE_DIR}/source/base64/buffer.c
         ${MEDIACACHE_DIR}/source/base64/decode.c
         ${MEDIACACHE_DIR}/source/base64/encode.c
+        ${MEDIACACHE_DIR}/source/cache/cache_utils.cc
+        ${MEDIACACHE_DIR}/source/common/string_utils.cc
+        ${MEDIACACHE_DIR}/source/network/request_parser.cc
         ${MEDIACACHE_DIR}/source/network/url_connection.cc
         ${MEDIACACHE_DIR}/source/proxy_server.cc
 )
@@ -75,6 +78,7 @@ file(
         ${MEDIACACHE_DIR}/android/jni/media_cache_env.c
         ${MEDIACACHE_DIR}/android/media_cache_jni.cc
         ${MEDIACACHE_DIR}/android/proxy_manager_android.cc
+        ${MEDIACACHE_DIR}/android/url_connection_android.cc
 )
 
 include_directories(${MEDIACACHE_DIR}/dist/android/openssl/${ANDROID_ABI}/include)
