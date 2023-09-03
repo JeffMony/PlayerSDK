@@ -54,6 +54,7 @@ include_directories(${MEDIACACHE_DIR}/source)
 include_directories(${MEDIACACHE_DIR}/source/base64)
 include_directories(${MEDIACACHE_DIR}/source/cache)
 include_directories(${MEDIACACHE_DIR}/source/common)
+include_directories(${MEDIACACHE_DIR}/source/listener)
 include_directories(${MEDIACACHE_DIR}/source/network)
 
 file(
@@ -66,6 +67,7 @@ file(
         ${MEDIACACHE_DIR}/source/common/string_utils.cc
         ${MEDIACACHE_DIR}/source/network/request_parser.cc
         ${MEDIACACHE_DIR}/source/network/url_connection.cc
+        ${MEDIACACHE_DIR}/source/proxy_cache.cc
         ${MEDIACACHE_DIR}/source/proxy_manager.cc
 )
 
@@ -83,11 +85,16 @@ file(
 
 include_directories(${MEDIACACHE_DIR}/dist/android/openssl/${ANDROID_ABI}/include)
 
-add_library(libcrypto STATIC IMPORTED)
-set_target_properties(libcrypto PROPERTIES IMPORTED_LOCATION ${MEDIACACHE_DIR}/dist/android/openssl/${ANDROID_ABI}/lib/libcrypto.a)
+if (USE_OPENSSL STREQUAL "true")
+    add_definitions("
+    -DUSE_OPENSSL
+    ")
+    add_library(libcrypto STATIC IMPORTED)
+    set_target_properties(libcrypto PROPERTIES IMPORTED_LOCATION ${MEDIACACHE_DIR}/dist/android/openssl/${ANDROID_ABI}/lib/libcrypto.a)
 
-add_library(libssl STATIC IMPORTED)
-set_target_properties(libssl PROPERTIES IMPORTED_LOCATION ${MEDIACACHE_DIR}/dist/android/openssl/${ANDROID_ABI}/lib/libssl.a)
+    add_library(libssl STATIC IMPORTED)
+    set_target_properties(libssl PROPERTIES IMPORTED_LOCATION ${MEDIACACHE_DIR}/dist/android/openssl/${ANDROID_ABI}/lib/libssl.a)
+endif()
 
 add_library(
         media_cache
@@ -97,13 +104,24 @@ add_library(
         ${android_platform_source}
 )
 
-target_link_libraries(
-        media_cache
-        android
-        log
-        z
-        m
-        dl
-        libssl
-        libcrypto
-)
+if (USE_OPENSSL STREQUAL "true")
+    target_link_libraries(
+            media_cache
+            android
+            log
+            z
+            m
+            dl
+            libssl
+            libcrypto
+    )
+else()
+    target_link_libraries(
+            media_cache
+            android
+            log
+            z
+            m
+            dl
+    )
+endif()
