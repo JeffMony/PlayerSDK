@@ -1,6 +1,10 @@
 package com.jeffmony.mediacache;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
+
+import com.jeffmony.mediacache.listener.CacheListener;
 
 import java.io.File;
 
@@ -8,6 +12,7 @@ public class ProxyManager {
 
     private long mHandler = 0;
 
+    private final Handler mMainHandler = new Handler(Looper.getMainLooper());
     private static volatile ProxyManager sProxyManager = null;
 
     public static final class Builder {
@@ -82,8 +87,8 @@ public class ProxyManager {
         initConfig(mHandler, config);
     }
 
-    public void start() {
-        start(mHandler);
+    public void startProxy() {
+        startProxy(mHandler);
     }
 
     public void close() {
@@ -94,9 +99,42 @@ public class ProxyManager {
         return getProxyUrl(mHandler, url);
     }
 
+    public void stop(String url) {
+        stop(mHandler, url);
+    }
+
+    public void addCacheListener(String url, CacheListener listener) {
+        addCacheListener(mHandler, url, listener);
+    }
+
+    public void removeCacheListener(String url) {
+        removeCacheListener(mHandler, url);
+    }
+
+    /**
+     * C++ 回调Java层代码
+     */
+    private void onCacheProgress(String url, String filePath, float progress, CacheListener listener) {
+        if (listener == null) {
+            return;
+        }
+        mMainHandler.post(() -> {
+            if (listener != null) {
+                listener.onCacheProgress(url, filePath, progress);
+            }
+        });
+    }
+
+
+    /**
+     * Java层调用C++函数
+     */
     private native long createHandler();
     private native void initConfig(long handler, ProxyConfig config);
-    private native void start(long handler);
+    private native void startProxy(long handler);
     private native void close(long handler);
     private native String getProxyUrl(long handler, String url);
+    private native void stop(long handler, String url);
+    private native void addCacheListener(long handler, String url, CacheListener listener);
+    private native void removeCacheListener(long handler, String url);
 }

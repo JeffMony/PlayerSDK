@@ -23,12 +23,12 @@ public class MyApplication extends Application {
         PlayerManager.getInstance().addGlobalPlayerInstanceListener(mListener);
         ProxyConfig proxyConfig = new ProxyManager.Builder()
                 .setCacheCleanStrategy(CacheCleanStrategy.LRU)
-                .setCacheDir("/sdcard/Pictures/")
+                .setCacheDir("/sdcard/Pictures/video-cache")
                 .setMaxSize(1024 * 1024 * 1024)
                 .setExpireTime(2 * 24 * 60 * 60 * 1000)
                 .build();
         ProxyManager.getInstance().initConfig(proxyConfig);
-        ProxyManager.getInstance().start();
+        ProxyManager.getInstance().startProxy();
     }
 
     private IPlayerInstanceListener mListener = new IPlayerInstanceListener() {

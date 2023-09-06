@@ -55,6 +55,7 @@ include_directories(${MEDIACACHE_DIR}/source/base64)
 include_directories(${MEDIACACHE_DIR}/source/cache)
 include_directories(${MEDIACACHE_DIR}/source/common)
 include_directories(${MEDIACACHE_DIR}/source/listener)
+include_directories(${MEDIACACHE_DIR}/source/md5)
 include_directories(${MEDIACACHE_DIR}/source/network)
 
 file(
@@ -65,6 +66,7 @@ file(
         ${MEDIACACHE_DIR}/source/base64/encode.c
         ${MEDIACACHE_DIR}/source/common/proxy_settings.cc
         ${MEDIACACHE_DIR}/source/common/string_utils.cc
+        ${MEDIACACHE_DIR}/source/md5/md5.cc
         ${MEDIACACHE_DIR}/source/network/request_parser.cc
         ${MEDIACACHE_DIR}/source/network/url_connection.cc
         ${MEDIACACHE_DIR}/source/proxy_cache.cc
